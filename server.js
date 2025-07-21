@@ -1,0 +1,337 @@
+#!/usr/bin/env node
+
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import {
+  ListToolsRequestSchema,
+  CallToolRequestSchema,
+} from '@modelcontextprotocol/sdk/types.js';
+
+// Import existing JavaScript/TypeScript tools (from lib/tools/)
+import { codePracticesTool, handleCodePractices } from './lib/tools/code-practices.js';
+import { codeFormatterTool, handleCodeFormatter } from './lib/tools/code-formatter.js';
+import { safetyCheckerTool, handleSafetyChecker } from './lib/tools/safety-checker.js';
+import { securityScannerTool, handleSecurityScanner } from './lib/tools/security-scanner.js';
+import { productionReadinessTool, handleProductionReadiness } from './lib/tools/production-readiness.js';
+import { accessibilityTool, handleAccessibilityChecker } from './lib/tools/accessibility-checker.js';
+import { graphqlSchemaCheckerTool, handleGraphqlSchemaCheck } from './lib/tools/graphql-schema-checker.js';
+import { graphqlQueryCheckerTool, handleGraphqlQueryCheck } from './lib/tools/graphql-query-checker.js';
+import { reduxPatternsCheckerTool, handleReduxPatternsCheck } from './lib/tools/redux-patterns-checker.js';
+import { 
+  intelligentDevelopmentAnalysisTool,
+  developmentSessionManagerTool,
+  semanticDevelopmentSearchTool,
+  handleIntelligentDevelopmentAnalysis,
+  handleDevelopmentSessionManager,
+  handleSemanticDevelopmentSearch
+} from './lib/tools/intelligent-tools.js';
+
+// Import security tools
+import { secureBashTool, handleSecureBash } from './lib/security/secure-bash.js';
+import { secureGrepTool, handleSecureGrep } from './lib/security/secure-grep.js';
+import { initializeSecurity } from './lib/security/security-init.js';
+
+// Import integration manager
+import { getIntegrationManager } from './lib/integration/integration-manager.js';
+
+// Import filesystem tools
+import { FilesystemToolsuite } from './lib/filesystem/filesystem-tools.js';
+
+// Import Rust tools (from lib/rust/)
+import { rustCodePracticesTool, handleRustCodePractices } from './lib/rust/rust-code-practices.js';
+import { rustFormatterTool, handleRustFormatter } from './lib/rust/rust-formatter.js';
+import { rustSafetyCheckerTool, handleRustSafetyChecker } from './lib/rust/rust-safety-checker.js';
+import { rustSecurityScannerTool, handleRustSecurityScanner } from './lib/rust/rust-security-scanner.js';
+import { rustProductionReadinessTool, handleRustProductionReadiness } from './lib/rust/rust-production-readiness.js';
+import { rustPerformanceAnalyzerTool, handleRustPerformanceAnalyzer } from './lib/rust/rust-performance-analyzer.js';
+
+// Import Python tools (from lib/python/)
+import { pythonCodeAnalyzerTool, handlePythonCodeAnalyzer } from './lib/python/python-code-analyzer.js';
+import { pythonFormatterTool, handlePythonFormatter } from './lib/python/python-formatter.js';
+import { pythonTypeCheckerTool, handlePythonTypeChecker } from './lib/python/python-type-checker.js';
+import { pythonSecurityScannerTool, handlePythonSecurityScanner } from './lib/python/python-security-scanner.js';
+import { pythonTestAnalyzerTool, handlePythonTestAnalyzer } from './lib/python/python-test-analyzer.js';
+import { pythonDependencyScannerTool, handlePythonDependencyScanner } from './lib/python/python-dependency-scanner.js';
+
+// Import Git tools (from lib/git/)
+import { gitBlameAnalyzerTool, handleGitBlameAnalyzer } from './lib/git/git-blame-analyzer.js';
+
+class MOIDVKServer {
+  constructor() {
+    this.server = new Server(
+      {
+        name: 'moidvk',
+        version: '1.0.0',
+        description: 'Intelligent Development and Deployment MCP Server - Comprehensive code analysis, formatting, and security tools for JavaScript/TypeScript, Rust, and Python projects.',
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
+
+    // Initialize security sandbox
+    try {
+      this.securitySandbox = initializeSecurity({
+        mode: process.env.MCP_SECURITY_MODE || 'block',
+        bypassTrustedTools: true
+      });
+    } catch (error) {
+      console.error('[MOIDVK] Security initialization failed:', error.message);
+      this.securitySandbox = null;
+    }
+
+    // Initialize filesystem tools
+    try {
+      this.fsTools = new FilesystemToolsuite();
+    } catch (error) {
+      console.error('[MOIDVK] Filesystem tools initialization failed:', error.message);
+      this.fsTools = null;
+    }
+
+    // Initialize integration manager (will be initialized in run() method)
+    this.integrationManager = null;
+
+    // Map of tool names to their handlers
+    this.toolHandlers = new Map([
+      // JavaScript/TypeScript tools
+      ['check_code_practices', handleCodePractices],
+      ['format_code', handleCodeFormatter],
+      ['check_safety_rules', handleSafetyChecker],
+      ['scan_security_vulnerabilities', handleSecurityScanner],
+      ['check_production_readiness', handleProductionReadiness],
+      ['check_accessibility', handleAccessibilityChecker],
+      ['check_graphql_schema', handleGraphqlSchemaCheck],
+      ['check_graphql_query', handleGraphqlQueryCheck],
+      ['check_redux_patterns', handleReduxPatternsCheck],
+      ['intelligent_development_analysis', handleIntelligentDevelopmentAnalysis],
+      ['development_session_manager', handleDevelopmentSessionManager],
+      ['semantic_development_search', handleSemanticDevelopmentSearch],
+      ['secure_bash', handleSecureBash],
+      ['secure_grep', handleSecureGrep],
+      
+      // Rust tools
+      ['rust_code_practices', handleRustCodePractices],
+      ['rust_formatter', handleRustFormatter],
+      ['rust_safety_checker', handleRustSafetyChecker],
+      ['rust_security_scanner', handleRustSecurityScanner],
+      ['rust_production_readiness', handleRustProductionReadiness],
+      ['rust_performance_analyzer', handleRustPerformanceAnalyzer],
+      
+      // Python tools
+      ['python_code_analyzer', handlePythonCodeAnalyzer],
+      ['python_formatter', handlePythonFormatter],
+      ['python_type_checker', handlePythonTypeChecker],
+      ['python_security_scanner', handlePythonSecurityScanner],
+      ['python_test_analyzer', handlePythonTestAnalyzer],
+      ['python_dependency_scanner', handlePythonDependencyScanner],
+      
+      // Git tools
+      ['git_blame_analyzer', handleGitBlameAnalyzer],
+    ]);
+
+    this.setupHandlers();
+  }
+
+  getTools() {
+    const tools = [
+      // JavaScript/TypeScript tools
+      codePracticesTool,
+      codeFormatterTool,
+      safetyCheckerTool,
+      securityScannerTool,
+      productionReadinessTool,
+      accessibilityTool,
+      graphqlSchemaCheckerTool,
+      graphqlQueryCheckerTool,
+      reduxPatternsCheckerTool,
+      intelligentDevelopmentAnalysisTool,
+      developmentSessionManagerTool,
+      semanticDevelopmentSearchTool,
+      secureBashTool,
+      secureGrepTool,
+      
+      // Rust tools
+      rustCodePracticesTool,
+      rustFormatterTool,
+      rustSafetyCheckerTool,
+      rustSecurityScannerTool,
+      rustProductionReadinessTool,
+      rustPerformanceAnalyzerTool,
+      
+      // Python tools
+      pythonCodeAnalyzerTool,
+      pythonFormatterTool,
+      pythonTypeCheckerTool,
+      pythonSecurityScannerTool,
+      pythonTestAnalyzerTool,
+      pythonDependencyScannerTool,
+      
+      // Git tools
+      gitBlameAnalyzerTool,
+      
+      // Filesystem tools
+      ...(this.fsTools ? this.fsTools.getTools() : []),
+    ];
+
+    return tools;
+  }
+
+  setupHandlers() {
+    this.server.setRequestHandler(ListToolsRequestSchema, async () => {
+      try {
+        return {
+          tools: this.getTools().map(tool => ({
+            name: tool.name,
+            description: tool.description,
+            inputSchema: tool.inputSchema,
+          })),
+        };
+      } catch (error) {
+        console.error('[MOIDVK] Error listing tools:', error.message);
+        return { tools: [] };
+      }
+    });
+
+    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+      const { name, arguments: args } = request.params;
+      
+      console.error(`[MOIDVK] Tool called: ${name}`);
+      
+      // Check if it's a filesystem tool first
+      if (this.fsTools) {
+        const fsTool = this.fsTools.getTools().find(t => t.name === name);
+        if (fsTool) {
+          try {
+            const result = await this.fsTools.handleToolCall(name, args || {});
+            console.error(`[MOIDVK] Tool ${name} completed successfully`);
+            return result;
+          } catch (error) {
+            console.error(`[MOIDVK] Error in tool ${name}:`, error);
+            return {
+              content: [{
+                type: 'text',
+                text: JSON.stringify({
+                  error: `Tool execution failed: ${error.message}`,
+                  tool: name,
+                  timestamp: new Date().toISOString()
+                }, null, 2)
+              }]
+            };
+          }
+        }
+      }
+
+      // Check regular tool handlers
+      const handler = this.toolHandlers.get(name);
+      if (!handler) {
+        throw new Error(`Unknown tool: ${name}`);
+      }
+
+      try {
+        const result = await handler(args || {});
+        console.error(`[MOIDVK] Tool ${name} completed successfully`);
+        return result;
+      } catch (error) {
+        console.error(`[MOIDVK] Error in tool ${name}:`, error);
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify({
+              error: `Tool execution failed: ${error.message}`,
+              tool: name,
+              timestamp: new Date().toISOString()
+            }, null, 2)
+          }]
+        };
+      }
+    });
+  }
+
+  async run() {
+    try {
+      const transport = new StdioServerTransport();
+      
+      // Set up error handlers
+      process.on('uncaughtException', (error) => {
+        console.error('[MOIDVK] Uncaught exception:', error.message);
+        process.exit(1);
+      });
+
+      process.on('unhandledRejection', (reason, promise) => {
+        console.error('[MOIDVK] Unhandled rejection at:', promise, 'reason:', reason);
+        process.exit(1);
+      });
+
+      // Initialize integration manager
+      try {
+        this.integrationManager = getIntegrationManager();
+        await this.integrationManager.initialize();
+        console.error('[MOIDVK] Integration manager initialized');
+      } catch (error) {
+        console.error('[MOIDVK] Integration manager initialization failed:', error.message);
+        this.integrationManager = null;
+      }
+
+      // Connect to transport
+      await this.server.connect(transport);
+      
+      // Set up graceful shutdown
+      process.on('SIGINT', async () => {
+        try {
+          if (this.integrationManager) {
+            await this.integrationManager.shutdown();
+          }
+          await this.server.close();
+        } catch (error) {
+          console.error('[MOIDVK] Error during shutdown:', error.message);
+        }
+        process.exit(0);
+      });
+
+      process.on('SIGTERM', async () => {
+        try {
+          if (this.integrationManager) {
+            await this.integrationManager.shutdown();
+          }
+          await this.server.close();
+        } catch (error) {
+          console.error('[MOIDVK] Error during shutdown:', error.message);
+        }
+        process.exit(0);
+      });
+      
+      console.error('[MOIDVK] Intelligent Development and Deployment MCP Server running on stdio');
+      console.error('[MOIDVK] Available languages: JavaScript/TypeScript, Rust, Python');
+      console.error('[MOIDVK] Total tools available:', this.getTools().length);
+      console.error('[MOIDVK] Tool categories:');
+      console.error('  - Code Analysis & Quality');
+      console.error('  - Code Formatting');
+      console.error('  - Security Scanning');
+      console.error('  - Safety & Production Readiness');
+      console.error('  - Type Checking (Python)');
+      console.error('  - Testing & Coverage (Python)');
+      console.error('  - Dependency Management');
+      console.error('  - Performance Analysis (Rust)');
+      console.error('  - Accessibility (JS/TS)');
+      console.error('  - GraphQL Tools');
+      console.error('  - Redux Patterns');
+      console.error('  - Intelligent Development');
+      console.error('  - File Operations');
+      console.error('  - Git Integration');
+      console.error('  - Secure Command Execution');
+      
+    } catch (error) {
+      console.error('[MOIDVK] Failed to start server:', error.message);
+      process.exit(1);
+    }
+  }
+}
+
+// Run the server
+const server = new MOIDVKServer();
+server.run().catch(error => {
+  console.error('[MOIDVK] Fatal error:', error.message);
+  process.exit(1);
+});

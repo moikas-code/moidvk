@@ -1,0 +1,50 @@
+{
+  "mcpServers": {
+    "moidvk": {
+      "command": "moidvk",
+      "args": ["serve"],
+      "env": {},
+      "integration": {
+        "kbMcp": {
+          "enabled": true,
+          "intelligentRouting": true,
+          "caching": true,
+          "enhancementThreshold": 0.7,
+          "preferredTools": {
+            "semanticSearch": "hybrid",
+            "codeAnalysis": "hybrid",
+            "patternDetection": "kb-mcp",
+            "projectAnalysis": "hybrid",
+            "securityScanning": "moidvk"
+          }
+        }
+      }
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "env": {}
+    },
+    "kb-mcp": {
+      "command": "kb",
+      "args": ["serve"],
+      "env": {},
+      "integration": {
+        "moidvk": {
+          "enabled": true,
+          "serverPath": "/home/moika/Documents/code/moidvk",
+          "toolTimeout": 60000,
+          "maxConcurrentTools": 5,
+          "enableIntelligentRouting": true,
+          "cacheResults": true
+        }
+      }
+    }
+  },
+  "integration": {
+    "bidirectional": true,
+    "sharedKnowledge": true,
+    "workflowOptimization": true,
+    "crossProjectInsights": true
+  }
+}
