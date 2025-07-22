@@ -6,76 +6,8 @@ on:
       - 'v*'
 
 jobs:
-  build-binaries:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            artifact: linux-x64
-          - os: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
-            artifact: linux-arm64
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
-            artifact: win32-x64
-          - os: macos-latest
-            target: x86_64-apple-darwin
-            artifact: darwin-x64
-          - os: macos-latest
-            target: aarch64-apple-darwin
-            artifact: darwin-arm64
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          target: ${{ matrix.target }}
-          override: true
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
-
-      - name: Install cross-compilation tools (Linux ARM64)
-        if: matrix.target == 'aarch64-unknown-linux-gnu'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-aarch64-linux-gnu
-
-      - name: Cache Rust dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            lib/rust-core/target
-          key: ${{ runner.os }}-${{ matrix.target }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-      - name: Install dependencies
-        run: bun install
-
-      - name: Build Rust binary
-        run: |
-          cd lib/rust-core
-          cargo build --release --target ${{ matrix.target }}
-
-      - name: Upload binary artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: moidvk-${{ matrix.artifact }}
-          path: lib/rust-core/target/${{ matrix.target }}/release/moidvk*
-
   test-release:
     runs-on: ubuntu-latest
-    needs: build-binaries
 
     steps:
       - name: Checkout code
@@ -115,7 +47,7 @@ jobs:
 
   publish:
     runs-on: ubuntu-latest
-    needs: [build-binaries, test-release]
+    needs: test-release
 
     steps:
       - name: Checkout code
@@ -132,15 +64,10 @@ jobs:
           toolchain: stable
           override: true
 
-      - name: Download all binary artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: ./artifacts
-
       - name: Install dependencies
         run: bun install
 
-      - name: Build project
+      - name: Build project (native platform only)
         run: bun run build:all
 
       - name: Update package.json for public release
