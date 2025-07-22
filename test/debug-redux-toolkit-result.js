@@ -129,7 +129,7 @@ async function debugReduxToolkitResult() {
     const jsonData = JSON.parse(response.result.content[1].text);
     console.log('\n📈 JSON Summary:');
     console.log(`- Total issues: ${jsonData.summary.totalIssues}`);
-    console.log(`- Severity breakdown:`, jsonData.summary.severityBreakdown);
+    console.log('- Severity breakdown:', jsonData.summary.severityBreakdown);
   }
   
   server.kill();

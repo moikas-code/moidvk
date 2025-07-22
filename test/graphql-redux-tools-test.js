@@ -86,7 +86,7 @@ class GraphQLReduxToolsTest {
     const jsonData = JSON.parse(response.result.content[1].text);
     
     console.log(`✅ Found ${jsonData.summary.totalIssues} schema issues`);
-    console.log(`✅ Severity breakdown:`, jsonData.summary.severityBreakdown);
+    console.log('✅ Severity breakdown:', jsonData.summary.severityBreakdown);
     console.log(`✅ Has pagination: ${jsonData.summary.hasMore}`);
     
     if (jsonData.issues.length > 0) {
@@ -161,8 +161,8 @@ class GraphQLReduxToolsTest {
     const jsonData = JSON.parse(response.result.content[1].text);
     
     console.log(`✅ Found ${jsonData.summary.totalIssues} query issues`);
-    console.log(`✅ Query metrics:`, jsonData.summary.queryMetrics);
-    console.log(`✅ Severity breakdown:`, jsonData.summary.severityBreakdown);
+    console.log('✅ Query metrics:', jsonData.summary.queryMetrics);
+    console.log('✅ Severity breakdown:', jsonData.summary.severityBreakdown);
     
     if (jsonData.issues.length > 0) {
       console.log('✅ Top 3 issues:');
@@ -242,8 +242,8 @@ class GraphQLReduxToolsTest {
     
     console.log(`✅ Detected code type: ${jsonData.summary.detectedCodeType}`);
     console.log(`✅ Found ${jsonData.summary.totalIssues} Redux issues`);
-    console.log(`✅ Severity breakdown:`, jsonData.summary.severityBreakdown);
-    console.log(`✅ Category breakdown:`, jsonData.summary.categoryBreakdown);
+    console.log('✅ Severity breakdown:', jsonData.summary.severityBreakdown);
+    console.log('✅ Category breakdown:', jsonData.summary.categoryBreakdown);
     
     if (jsonData.issues.length > 0) {
       console.log('✅ Top 3 issues:');

@@ -4,7 +4,7 @@
 
 const testCases = [
   {
-    name: "Recursion violation",
+    name: 'Recursion violation',
     code: `
 function factorial(n) {
   if (n <= 1) return 1;
@@ -13,7 +13,7 @@ function factorial(n) {
     expectedViolations: ['recursion']
   },
   {
-    name: "Infinite loop violation",
+    name: 'Infinite loop violation',
     code: `
 function runForever() {
   while (true) {
@@ -23,7 +23,7 @@ function runForever() {
     expectedViolations: ['infinite-loop']
   },
   {
-    name: "Long function violation",
+    name: 'Long function violation',
     code: `
 function veryLongFunction() {
 ${Array(65).fill('  console.log("Line");').join('\n')}
@@ -31,7 +31,7 @@ ${Array(65).fill('  console.log("Line");').join('\n')}
     expectedViolations: ['function-length']
   },
   {
-    name: "Global variable violation",
+    name: 'Global variable violation',
     code: `
 var globalVar = 42; // Global scope
 let anotherGlobal = "bad";
@@ -42,7 +42,7 @@ function useGlobal() {
     expectedViolations: ['global-variable', 'var-usage']
   },
   {
-    name: "Missing assertions",
+    name: 'Missing assertions',
     code: `
 function divide(a, b) {
   // No validation checks
@@ -51,7 +51,7 @@ function divide(a, b) {
     expectedViolations: ['insufficient-assertions']
   },
   {
-    name: "Safe code with assertions",
+    name: 'Safe code with assertions',
     code: `
 function safeDivide(a, b) {
   if (typeof a !== 'number') throw new Error('a must be number');
@@ -63,7 +63,7 @@ function safeDivide(a, b) {
     expectedViolations: []
   },
   {
-    name: "Unbounded loop",
+    name: 'Unbounded loop',
     code: `
 function searchArray(arr, target) {
   for (let i = 0; i < arr.length; i++) {
@@ -74,13 +74,13 @@ function searchArray(arr, target) {
     expectedViolations: [] // for-of/for-in are considered bounded
   },
   {
-    name: "Deep property nesting",
+    name: 'Deep property nesting',
     code: `
 const value = obj.level1.level2.level3.level4.level5;`,
     expectedViolations: ['deep-nesting']
   },
   {
-    name: "Ignored async return",
+    name: 'Ignored async return',
     code: `
 async function getData() {
   return fetch('/api/data');
@@ -92,7 +92,7 @@ function main() {
     expectedViolations: ['ignored-async-return']
   },
   {
-    name: "Multiple violations",
+    name: 'Multiple violations',
     code: `
 var GLOBAL = true;
 
@@ -110,7 +110,7 @@ function recursiveCount(n) {
   }
 ];
 
-console.log("Testing NASA JPL Safety Rules Analyzer...\n");
+console.log('Testing NASA JPL Safety Rules Analyzer...\n');
 
 let passed = 0;
 let failed = 0;
@@ -124,7 +124,7 @@ for (const testCase of testCases) {
     
     const expectedCount = testCase.expectedViolations.length;
     if (expectedCount === 0) {
-      console.log("  ✅ Expected: Safe code (no violations)");
+      console.log('  ✅ Expected: Safe code (no violations)');
     } else {
       console.log(`  ✅ Expected violations: ${testCase.expectedViolations.join(', ')}`);
     }
@@ -136,4 +136,4 @@ for (const testCase of testCases) {
 }
 
 console.log(`\nResults: ${passed} passed, ${failed} failed`);
-console.log("\nNote: To see actual analysis results, use the tool via Claude Desktop.");
+console.log('\nNote: To see actual analysis results, use the tool via Claude Desktop.');

@@ -8,12 +8,12 @@ import { handleAccessibilityChecker } from '../lib/tools/accessibility-checker.j
 import { handleSecurityScanner } from '../lib/tools/security-scanner.js';
 
 async function runDirectAudit() {
-  console.log("🔍 Running Direct moidvk Audit\n");
-  console.log("=".repeat(80));
+  console.log('🔍 Running Direct moidvk Audit\n');
+  console.log('='.repeat(80));
 
   // Test 1: check_code_practices on server.js
-  console.log("\n1️⃣ CODE PRACTICES CHECK");
-  console.log("-".repeat(80));
+  console.log('\n1️⃣ CODE PRACTICES CHECK');
+  console.log('-'.repeat(80));
   try {
     const codePracticesResult = await handleCodePractices({
       code: `import { Server } from '@modelcontextprotocol/sdk/server/index.js';
@@ -39,17 +39,17 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     };
   }
 });`,
-      filename: "server.js"
+      filename: 'server.js'
     });
     
     console.log(codePracticesResult.content[0].text);
   } catch (error) {
-    console.error("Error:", error.message);
+    console.error('Error:', error.message);
   }
 
   // Test 2: check_production_readiness with strict=true
-  console.log("\n\n2️⃣ PRODUCTION READINESS CHECK (strict mode)");
-  console.log("-".repeat(80));
+  console.log('\n\n2️⃣ PRODUCTION READINESS CHECK (strict mode)');
+  console.log('-'.repeat(80));
   try {
     const productionResult = await handleProductionReadiness({
       code: `// Sample production code
@@ -72,18 +72,18 @@ debugger;
 
 // And TODO comments
 // TODO: Fix this later`,
-      filename: "server.js",
+      filename: 'server.js',
       strict: true
     });
     
     console.log(productionResult.content[0].text);
   } catch (error) {
-    console.error("Error:", error.message);
+    console.error('Error:', error.message);
   }
 
   // Test 3: check_safety_rules on RateLimiter
-  console.log("\n\n3️⃣ SAFETY RULES CHECK");
-  console.log("-".repeat(80));
+  console.log('\n\n3️⃣ SAFETY RULES CHECK');
+  console.log('-'.repeat(80));
   try {
     const safetyResult = await handleSafetyChecker({
       code: `export class RateLimiter {
@@ -113,17 +113,17 @@ debugger;
     this.requests.delete(identifier);
   }
 }`,
-      filename: "RateLimiter.js"
+      filename: 'RateLimiter.js'
     });
     
     console.log(safetyResult.content[0].text);
   } catch (error) {
-    console.error("Error:", error.message);
+    console.error('Error:', error.message);
   }
 
   // Test 4: check_accessibility on HTML
-  console.log("\n\n4️⃣ ACCESSIBILITY CHECK (HTML file support)");
-  console.log("-".repeat(80));
+  console.log('\n\n4️⃣ ACCESSIBILITY CHECK (HTML file support)');
+  console.log('-'.repeat(80));
   try {
     const accessibilityResult = await handleAccessibilityChecker({
       code: `<div class="container">
@@ -138,38 +138,38 @@ debugger;
     <button type="submit">Submit</button>
   </form>
 </div>`,
-      filename: "test.html"
+      filename: 'test.html'
     });
     
     console.log(accessibilityResult.content[0].text);
   } catch (error) {
-    console.error("Error:", error.message);
+    console.error('Error:', error.message);
   }
 
   // Test 5: scan_security_vulnerabilities
-  console.log("\n\n5️⃣ SECURITY VULNERABILITY SCAN");
-  console.log("-".repeat(80));
+  console.log('\n\n5️⃣ SECURITY VULNERABILITY SCAN');
+  console.log('-'.repeat(80));
   try {
     const securityResult = await handleSecurityScanner({
-      format: "summary",
+      format: 'summary',
       includeTests: false
     });
     
     console.log(securityResult.content[0].text);
   } catch (error) {
-    console.error("Error:", error.message);
+    console.error('Error:', error.message);
   }
 
-  console.log("\n\n" + "=".repeat(80));
-  console.log("✅ AUDIT COMPLETE");
-  console.log("=".repeat(80));
-  console.log("\nKey Findings:");
-  console.log("- Code practices tool: Working");
-  console.log("- Production readiness with strict mode: Working");
-  console.log("- Safety rules checker: Working");
-  console.log("- Accessibility checker with HTML support: Working");
-  console.log("- Security vulnerability scanner: Working");
-  console.log("\nAll tools are functioning correctly!");
+  console.log('\n\n' + '='.repeat(80));
+  console.log('✅ AUDIT COMPLETE');
+  console.log('='.repeat(80));
+  console.log('\nKey Findings:');
+  console.log('- Code practices tool: Working');
+  console.log('- Production readiness with strict mode: Working');
+  console.log('- Safety rules checker: Working');
+  console.log('- Accessibility checker with HTML support: Working');
+  console.log('- Security vulnerability scanner: Working');
+  console.log('\nAll tools are functioning correctly!');
 }
 
 // Run the audit

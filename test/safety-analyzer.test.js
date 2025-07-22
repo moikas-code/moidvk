@@ -3,12 +3,12 @@
 import { SafetyAnalyzer } from '../lib/safety-analyzer.js';
 
 // Test the SafetyAnalyzer directly
-console.log("Testing SafetyAnalyzer directly...\n");
+console.log('Testing SafetyAnalyzer directly...\n');
 
 const analyzer = new SafetyAnalyzer();
 
 // Test 1: Recursion
-console.log("Test 1: Recursion Detection");
+console.log('Test 1: Recursion Detection');
 const recursiveCode = `
 function factorial(n) {
   if (n <= 1) return 1;
@@ -16,7 +16,7 @@ function factorial(n) {
 }`;
 
 const result1 = analyzer.analyze(recursiveCode);
-console.log("  Result:", JSON.stringify(result1, null, 2));
+console.log('  Result:', JSON.stringify(result1, null, 2));
 if (result1.success) {
   console.log(`  Safety Score: ${result1.score}/100`);
   console.log(`  Violations: ${result1.violations.map(v => v.rule).join(', ')}`);
@@ -26,7 +26,7 @@ if (result1.success) {
 }
 
 // Test 2: Safe code
-console.log("Test 2: Safe Code");
+console.log('Test 2: Safe Code');
 const safeCode = `
 function add(a, b) {
   if (typeof a !== 'number') throw new Error('a must be number');
@@ -40,7 +40,7 @@ console.log(`  Violations: ${result2.violations.length}`);
 console.log(`  ${result2.score === 100 ? '✅' : '❌'} Perfect safety score\n`);
 
 // Test 3: Multiple violations
-console.log("Test 3: Multiple Violations");
+console.log('Test 3: Multiple Violations');
 const unsafeCode = `
 var globalConfig = {};
 
@@ -60,4 +60,4 @@ if (result3.success) {
   console.log(`  ❌ Analysis failed: ${result3.error}\n`);
 }
 
-console.log("All tests completed!");
+console.log('All tests completed!');

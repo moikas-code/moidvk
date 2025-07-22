@@ -306,7 +306,7 @@ function processData(data) {
     const response = await this.sendRequest(request);
     const result = JSON.parse(response.result.content[0].text);
     
-    console.log(`✅ Project analysis completed`);
+    console.log('✅ Project analysis completed');
     console.log(`✅ Root path: ${result.rootPath}`);
     console.log(`✅ Structure name: ${result.structure?.name || 'project structure'}`);
     console.log(`✅ Has children: ${result.structure?.children ? result.structure.children.length : 0}`);

@@ -65,7 +65,7 @@ async function testEmbeddingUpgrade() {
           const isExpectedSimilar = 
             (testCase.expectedSimilar.includes(i) && testCase.expectedSimilar.includes(j));
           const status = isExpectedSimilar && similarity > 0.7 ? '✅' : 
-                        !isExpectedSimilar && similarity < 0.5 ? '✅' : '⚠️';
+            !isExpectedSimilar && similarity < 0.5 ? '✅' : '⚠️';
           
           console.log(`    Text ${i + 1} vs Text ${j + 1}: ${(similarity * 100).toFixed(1)}% ${status}`);
         }

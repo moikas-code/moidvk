@@ -151,7 +151,7 @@ async function testSecurityScannerPagination() {
       
       const output = result.content[0].text;
       console.log(`✅ Format ${format}: contains scan results header:`, 
-                  output.includes('🔒 Security Vulnerability Scan Results'));
+        output.includes('🔒 Security Vulnerability Scan Results'));
     }
     
   } catch (error) {

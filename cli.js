@@ -6,7 +6,7 @@
  */
 
 import { promises as fs } from 'node:fs';
-import { stdin as input, stdout as output } from 'node:process';
+import { stdin as input, stdout as _output } from 'node:process';
 import { createInterface } from 'node:readline/promises';
 import path from 'path';
 import { spawn } from 'child_process';
@@ -21,15 +21,15 @@ import { handleAccessibilityChecker } from './lib/tools/accessibility-checker.js
 import { handleGraphqlSchemaCheck } from './lib/tools/graphql-schema-checker.js';
 import { handleGraphqlQueryCheck } from './lib/tools/graphql-query-checker.js';
 import { handleReduxPatternsCheck } from './lib/tools/redux-patterns-checker.js';
-import { 
+import {
   handleIntelligentDevelopmentAnalysis,
   handleDevelopmentSessionManager,
-  handleSemanticDevelopmentSearch
+  handleSemanticDevelopmentSearch,
 } from './lib/tools/intelligent-tools.js';
 
 // Tool mapping
 const TOOLS = {
-  'serve': {
+  serve: {
     handler: null, // Special handler for serve command
     name: 'serve',
     description: 'Start the MCP server',
@@ -44,7 +44,7 @@ const TOOLS = {
     requiresCode: true,
     requiresFile: false,
   },
-  'format': {
+  format: {
     handler: handleCodeFormatter,
     name: 'format_code',
     description: 'Format code with consistent style',
@@ -109,7 +109,7 @@ const TOOLS = {
     requiresFile: false,
     requiresPath: true,
   },
-  'session': {
+  session: {
     handler: handleDevelopmentSessionManager,
     name: 'development_session_manager',
     description: 'Manage development sessions across MCP clients',
@@ -129,10 +129,10 @@ const TOOLS = {
 /**
  * Start the MCP server
  */
-async function startServer(options) {
+async function startServer(_options) {
   // Check if we're in MCP mode (no TTY means we're being called by an MCP client)
   const isMCPMode = !process.stdin.isTTY;
-  
+
   if (isMCPMode) {
     // In MCP mode, directly run the server without spawning
     // This maintains stdio communication with the MCP client
@@ -149,42 +149,42 @@ async function startServer(options) {
     console.log('🚀 Starting moidvk MCP server...');
     console.log('📡 Server will be available via MCP protocol');
     console.log('🔧 Available tools:');
-    
+
     // List available tools
     Object.entries(TOOLS).forEach(([, tool]) => {
       if (!tool.isServerCommand) {
         console.log(`   • ${tool.name}: ${tool.description}`);
       }
     });
-    
+
     console.log('\n⏹️  Press Ctrl+C to stop the server\n');
     /* eslint-enable no-console */
-    
+
     // Start the server process
     const serverProcess = spawn('bun', ['server.js'], {
       stdio: 'inherit',
       cwd: process.cwd(),
     });
-    
+
     // Handle process events
     serverProcess.on('error', (error) => {
       console.error('❌ Failed to start server:', error.message); // eslint-disable-line no-console
       process.exit(1);
     });
-    
+
     serverProcess.on('exit', (code) => {
       if (code !== 0) {
         console.error(`❌ Server exited with code ${code}`); // eslint-disable-line no-console
         process.exit(code);
       }
     });
-    
+
     // Handle graceful shutdown
     process.on('SIGINT', () => {
       console.log('\n🛑 Shutting down server...'); // eslint-disable-line no-console
       serverProcess.kill('SIGINT');
     });
-    
+
     process.on('SIGTERM', () => {
       console.log('\n🛑 Shutting down server...'); // eslint-disable-line no-console
       serverProcess.kill('SIGTERM');
@@ -195,41 +195,41 @@ async function startServer(options) {
 /**
  * Start the test MCP server
  */
-async function startTestServer(options) {
+async function _startTestServer(_options) {
   /* eslint-disable no-console */
   console.log('🧪 Starting moidvk test server...');
   console.log('📡 Test server will be available via MCP protocol');
   console.log('🔧 Available tools:');
   console.log('   • test_tool: A simple test tool');
-  
+
   console.log('\n⏹️  Press Ctrl+C to stop the server\n');
   /* eslint-enable no-console */
-  
+
   // Start the test server process
   const serverProcess = spawn('bun', ['test-server.js'], {
     stdio: 'inherit',
     cwd: process.cwd(),
   });
-  
+
   // Handle process events
   serverProcess.on('error', (error) => {
     console.error('❌ Failed to start test server:', error.message); // eslint-disable-line no-console
     process.exit(1);
   });
-  
+
   serverProcess.on('exit', (code) => {
     if (code !== 0) {
       console.error(`❌ Test server exited with code ${code}`); // eslint-disable-line no-console
       process.exit(code);
     }
   });
-  
+
   // Handle graceful shutdown
   process.on('SIGINT', () => {
     console.log('\n🛑 Shutting down test server...'); // eslint-disable-line no-console
     serverProcess.kill('SIGINT');
   });
-  
+
   process.on('SIGTERM', () => {
     console.log('\n🛑 Shutting down server...'); // eslint-disable-line no-console
     serverProcess.kill('SIGTERM');
@@ -240,16 +240,16 @@ async function startTestServer(options) {
  * Display help information
  */
 function showHelp() {
-  console.log(` // eslint-disable-line no-console
+  console.log(`
 moidvk CLI - Code analysis and quality tools
 
 Usage:
   moidvk <command> [options]
 
 Commands:
-${Object.entries(TOOLS).map(([cmd, tool]) => 
-  `  ${cmd.padEnd(20)} ${tool.description}`
-).join('\n')}
+${Object.entries(TOOLS)
+    .map(([cmd, tool]) => `  ${cmd.padEnd(20)} ${tool.description}`)
+    .join('\n')}
 
 Options:
   -f, --file <path>     Read code from file instead of stdin
@@ -326,7 +326,7 @@ function parseArgs(args) {
   let i = 0;
   while (i < args.length) {
     const arg = args[i];
-    
+
     if (arg === '-h' || arg === '--help') {
       options.help = true;
       break;
@@ -372,20 +372,20 @@ async function readCode(options) {
   if (options.file) {
     return await fs.readFile(options.file, 'utf-8');
   }
-  
+
   // Read from stdin
   if (process.stdin.isTTY) {
     console.error('Error: No input provided. Use -f to specify a file or pipe input via stdin.'); // eslint-disable-line no-console
     process.exit(1);
   }
-  
+
   const rl = createInterface({ input, output: null });
   const lines = [];
-  
+
   for await (const line of rl) {
     lines.push(line);
   }
-  
+
   return lines.join('\n');
 }
 
@@ -412,7 +412,7 @@ function formatOutput(response, format) {
       }
     }
   }
-  
+
   // Default text output
   return response.content?.[0]?.text || 'No output';
 }
@@ -443,15 +443,13 @@ async function main() {
       return; // Don't exit, let the server run
     }
 
-
-
     let toolArgs = {};
 
     // Get code input if required
     if (tool.requiresCode) {
       const code = await readCode(options);
       toolArgs.code = code;
-      
+
       // Set filename if provided or infer from file path
       if (options.file) {
         toolArgs.filename = path.basename(options.file);
@@ -473,13 +471,13 @@ async function main() {
     if (options.format && tool.name === 'scan_security_vulnerabilities') {
       toolArgs.format = options.format;
     }
-    
+
     // Handle intelligent tool arguments
     if (tool.name === 'intelligent_development_analysis') {
       toolArgs.goals = options.goals?.split(',') || [];
       toolArgs.client_type = options.client || 'cli';
     }
-    
+
     if (tool.name === 'development_session_manager') {
       toolArgs.action = options.action || 'list';
       if (options.goals) {
@@ -489,7 +487,7 @@ async function main() {
         toolArgs.session_id = options.sessionId;
       }
     }
-    
+
     if (tool.name === 'semantic_development_search') {
       toolArgs.query = options.query || '';
       toolArgs.type = options.searchType || 'similar_code';
@@ -498,10 +496,10 @@ async function main() {
 
     // Call the tool handler
     const response = await tool.handler(toolArgs);
-    
+
     // Format and output results
     const output = formatOutput(response, options.format);
-    
+
     if (options.output) {
       await fs.writeFile(options.output, output);
       console.log(`Output written to ${options.output}`); // eslint-disable-line no-console
@@ -517,7 +515,7 @@ async function main() {
 }
 
 // Run CLI
-main().catch(error => {
+main().catch((error) => {
   console.error('Fatal error:', error); // eslint-disable-line no-console
   process.exit(1);
 });

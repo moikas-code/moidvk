@@ -13,7 +13,7 @@ function createMockVulnData(count = 10) {
       severity: severities[i % severities.length],
       title: `Vulnerability ${i} in package-${i}`,
       url: `https://example.com/vuln-${i}`,
-      range: `>=1.0.0 <2.0.0`,
+      range: '>=1.0.0 <2.0.0',
       fixAvailable: i % 2 === 0
     });
   }
@@ -125,7 +125,7 @@ function formatVulnerabilityReport(vulnData, format, manager, options = {}) {
       output += `\\n${i + 1}. ${vuln.package}\\n`;
       output += `   Severity: ${vuln.severity}\\n`;
       output += `   Title: ${vuln.title}\\n`;
-      if (vuln.fixAvailable) output += `   ✅ Fix available\\n`;
+      if (vuln.fixAvailable) output += '   ✅ Fix available\\n';
     });
     output += '\\n';
   }

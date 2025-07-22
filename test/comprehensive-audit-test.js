@@ -3,32 +3,32 @@
 // Comprehensive audit test script for moidvk server
 // Tests all requested functionality including accessibility checker fixes
 
-import { spawn } from "child_process";
-import { promisify } from "util";
+import { spawn } from 'child_process';
+import { promisify } from 'util';
 
 const sleep = promisify(setTimeout);
 
 async function runComprehensiveAudit() {
-  console.log("Starting comprehensive moidvk server audit...\n");
+  console.log('Starting comprehensive moidvk server audit...\n');
   
   // Start the server
-  const server = spawn("bun", ["run", "server.js"], {
-    stdio: ["pipe", "pipe", "pipe"]
+  const server = spawn('bun', ['run', 'server.js'], {
+    stdio: ['pipe', 'pipe', 'pipe']
   });
   
   let responses = [];
   
   // Listen for responses
-  server.stdout.on("data", (data) => {
-    const lines = data.toString().split("\n").filter(line => line.trim());
+  server.stdout.on('data', (data) => {
+    const lines = data.toString().split('\n').filter(line => line.trim());
     lines.forEach(line => {
       try {
         const response = JSON.parse(line);
         responses.push(response);
         if (response.result && response.result.content) {
-          console.log("\n" + "=".repeat(80));
+          console.log('\n' + '='.repeat(80));
           console.log(`Response for request ${response.id}:`);
-          console.log("=".repeat(80));
+          console.log('='.repeat(80));
           response.result.content.forEach(content => {
             if (content.type === 'text') {
               console.log(content.text);
@@ -46,30 +46,30 @@ async function runComprehensiveAudit() {
   
   // Send initialization request
   const initRequest = {
-    jsonrpc: "2.0",
+    jsonrpc: '2.0',
     id: 1,
-    method: "initialize",
+    method: 'initialize',
     params: {
-      protocolVersion: "2024-10-07",
+      protocolVersion: '2024-10-07',
       capabilities: {},
       clientInfo: {
-        name: "audit-client",
-        version: "1.0.0"
+        name: 'audit-client',
+        version: '1.0.0'
       }
     }
   };
   
-  server.stdin.write(JSON.stringify(initRequest) + "\n");
+  server.stdin.write(JSON.stringify(initRequest) + '\n');
   await sleep(500);
   
   // Test 1: check_code_practices on server.js
-  console.log("\n1. Running check_code_practices on server.js...");
+  console.log('\n1. Running check_code_practices on server.js...');
   const codePracticesRequest = {
-    jsonrpc: "2.0",
+    jsonrpc: '2.0',
     id: 2,
-    method: "tools/call",
+    method: 'tools/call',
     params: {
-      name: "check_code_practices",
+      name: 'check_code_practices',
       arguments: {
         code: `import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
@@ -101,22 +101,22 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     };
   }
 });`,
-        filename: "server.js"
+        filename: 'server.js'
       }
     }
   };
   
-  server.stdin.write(JSON.stringify(codePracticesRequest) + "\n");
+  server.stdin.write(JSON.stringify(codePracticesRequest) + '\n');
   await sleep(2000);
   
   // Test 2: check_production_readiness with strict=true
-  console.log("\n2. Running check_production_readiness on server.js with strict=true...");
+  console.log('\n2. Running check_production_readiness on server.js with strict=true...');
   const productionReadinessRequest = {
-    jsonrpc: "2.0",
+    jsonrpc: '2.0',
     id: 3,
-    method: "tools/call",
+    method: 'tools/call',
     params: {
-      name: "check_production_readiness",
+      name: 'check_production_readiness',
       arguments: {
         code: `// Sample production code
 const server = new Server({ name: 'moidvk' });
@@ -132,17 +132,17 @@ main().catch(error => {
   console.error('Fatal error:', error);
   process.exit(1);
 });`,
-        filename: "server.js",
+        filename: 'server.js',
         strict: true
       }
     }
   };
   
-  server.stdin.write(JSON.stringify(productionReadinessRequest) + "\n");
+  server.stdin.write(JSON.stringify(productionReadinessRequest) + '\n');
   await sleep(2000);
   
   // Test 3: check_safety_rules on RateLimiter class
-  console.log("\n3. Running check_safety_rules on RateLimiter class...");
+  console.log('\n3. Running check_safety_rules on RateLimiter class...');
   
   // First read the RateLimiter class
   const rateLimiterCode = `// RateLimiter class for safety analysis
@@ -175,29 +175,29 @@ export class RateLimiter {
 }`;
   
   const safetyRulesRequest = {
-    jsonrpc: "2.0",
+    jsonrpc: '2.0',
     id: 4,
-    method: "tools/call",
+    method: 'tools/call',
     params: {
-      name: "check_safety_rules",
+      name: 'check_safety_rules',
       arguments: {
         code: rateLimiterCode,
-        filename: "RateLimiter.js"
+        filename: 'RateLimiter.js'
       }
     }
   };
   
-  server.stdin.write(JSON.stringify(safetyRulesRequest) + "\n");
+  server.stdin.write(JSON.stringify(safetyRulesRequest) + '\n');
   await sleep(2000);
   
   // Test 4: check_accessibility on HTML content
-  console.log("\n4. Running check_accessibility on HTML content to verify fixes...");
+  console.log('\n4. Running check_accessibility on HTML content to verify fixes...');
   const accessibilityRequest = {
-    jsonrpc: "2.0",
+    jsonrpc: '2.0',
     id: 5,
-    method: "tools/call",
+    method: 'tools/call',
     params: {
-      name: "check_accessibility",
+      name: 'check_accessibility',
       arguments: {
         code: `<div class="container">
   <h1>Security Audit Report</h1>
@@ -205,46 +205,46 @@ export class RateLimiter {
   <button onclick="alert('test')">Click me</button>
   <img src="test.jpg" alt="Test image">
 </div>`,
-        filename: "test.html"
+        filename: 'test.html'
       }
     }
   };
   
-  server.stdin.write(JSON.stringify(accessibilityRequest) + "\n");
+  server.stdin.write(JSON.stringify(accessibilityRequest) + '\n');
   await sleep(2000);
   
   // Test 5: scan_security_vulnerabilities on the project
-  console.log("\n5. Running scan_security_vulnerabilities on the project...");
+  console.log('\n5. Running scan_security_vulnerabilities on the project...');
   const securityScanRequest = {
-    jsonrpc: "2.0",
+    jsonrpc: '2.0',
     id: 6,
-    method: "tools/call",
+    method: 'tools/call',
     params: {
-      name: "scan_security_vulnerabilities",
+      name: 'scan_security_vulnerabilities',
       arguments: {
-        format: "detailed",
+        format: 'detailed',
         includeTests: false
       }
     }
   };
   
-  server.stdin.write(JSON.stringify(securityScanRequest) + "\n");
+  server.stdin.write(JSON.stringify(securityScanRequest) + '\n');
   await sleep(3000);
   
   // Clean up
-  console.log("\n\nAudit complete! Stopping server...");
+  console.log('\n\nAudit complete! Stopping server...');
   server.kill();
   
-  console.log("\n" + "=".repeat(80));
-  console.log("AUDIT SUMMARY");
-  console.log("=".repeat(80));
-  console.log("Total responses received:", responses.length);
-  console.log("\nThe audit tested:");
-  console.log("1. Code practices checking");
-  console.log("2. Production readiness with strict mode");
-  console.log("3. Safety rules for RateLimiter class");
-  console.log("4. Accessibility checking on HTML (verifying filename fix)");
-  console.log("5. Security vulnerability scanning");
+  console.log('\n' + '='.repeat(80));
+  console.log('AUDIT SUMMARY');
+  console.log('='.repeat(80));
+  console.log('Total responses received:', responses.length);
+  console.log('\nThe audit tested:');
+  console.log('1. Code practices checking');
+  console.log('2. Production readiness with strict mode');
+  console.log('3. Safety rules for RateLimiter class');
+  console.log('4. Accessibility checking on HTML (verifying filename fix)');
+  console.log('5. Security vulnerability scanning');
 }
 
 // Run the audit

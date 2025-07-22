@@ -93,13 +93,13 @@ function checkVersionConsistency() {
             `⚠️  Git tag (${results.gitTag}) doesn't match file versions (${uniqueVersions[0]})`,
           );
         } else if (gitTagVersion) {
-          console.log(`✅ Git tag matches file versions`);
+          console.log('✅ Git tag matches file versions');
           results.consistent = true;
         } else {
           results.issues.push(`⚠️  No git tag found for version ${uniqueVersions[0]}`);
         }
       } else {
-        results.issues.push(`❌ Version mismatch found:`);
+        results.issues.push('❌ Version mismatch found:');
         if (results.packageJson) results.issues.push(`   package.json: ${results.packageJson}`);
         if (results.readme) results.issues.push(`   README.md: ${results.readme}`);
         if (results.serverJs) results.issues.push(`   server.js: ${results.serverJs}`);

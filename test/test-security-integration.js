@@ -113,7 +113,7 @@ async function testSecurityIntegration() {
     const result6 = await executor6.execute('rm', ['test-file-to-delete.txt']);
     if (result6.requiresConsent) {
       console.log('✅ rm requires consent for safe file deletion');
-      console.log(`   Would delete: test-file-to-delete.txt (with user confirmation)`);
+      console.log('   Would delete: test-file-to-delete.txt (with user confirmation)');
     }
     
     // Clean up

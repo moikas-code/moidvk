@@ -356,7 +356,7 @@ class UniversalSandboxTestRunner {
     }
 
     this.logResult('Universal audit logging commands executed', auditTestsPassed >= 2, 
-                  `${auditTestsPassed}/${commands.length} commands logged`);
+      `${auditTestsPassed}/${commands.length} commands logged`);
   }
 
   async testPerformanceOptimization() {
