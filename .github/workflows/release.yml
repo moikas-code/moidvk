@@ -38,7 +38,9 @@ jobs:
 
       - name: Test package integrity
         run: |
-          bun pack --dry-run
+          npm pack --dry-run
+        env:
+          CI: true
 
       - name: Verify CLI functionality
         run: |

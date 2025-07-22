@@ -65,7 +65,9 @@ jobs:
       - name: Verify package contents
         run: |
           echo "Package contents:"
-          bun pack --dry-run
+          npm pack --dry-run
+        env:
+          CI: true
 
       - name: Configure npm registry
         if: ${{ !github.event.inputs.dry_run }}

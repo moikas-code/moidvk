@@ -35,7 +35,7 @@
     "build:napi": "napi build --platform --release --cargo-cwd lib/rust-core",
     "build:napi:debug": "napi build --platform --cargo-cwd lib/rust-core",
     "build:all": "npm run build:rust && npm run build:napi",
-    "postinstall": "npm run build:all || echo 'Rust build failed, falling back to JavaScript implementations'",
+    "postinstall": "if [ \"$CI\" = \"true\" ] || [ \"$NODE_ENV\" = \"production\" ]; then echo 'Skipping build in CI/production'; else npm run build:all || echo 'Rust build failed, falling back to JavaScript implementations'; fi",
     "prepublishOnly": "npm run build:all && npm test && npm run lint",
     "benchmark": "node scripts/run-benchmarks.js",
     "benchmark:quick": "node scripts/run-benchmarks.js --quick",
