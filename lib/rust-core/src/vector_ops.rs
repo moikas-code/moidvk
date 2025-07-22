@@ -309,23 +309,38 @@ impl VectorOperations {
 
     /// Internal vector norm calculation
     fn vector_norm_internal(&self, vector: &[f32]) -> f32 {
-        if self.config.use_simd && is_x86_feature_detected!("avx2") {
-            unsafe { self.vector_norm_simd(vector) }
-        } else {
+        #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+        {
+            if self.config.use_simd && is_x86_feature_detected!("avx2") {
+                unsafe { self.vector_norm_simd(vector) }
+            } else {
+                vector.iter().map(|x| x * x).sum::<f32>().sqrt()
+            }
+        }
+        #[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
+        {
             vector.iter().map(|x| x * x).sum::<f32>().sqrt()
         }
     }
 
     /// Internal cosine similarity implementation with SIMD optimization
     fn cosine_similarity_internal(&self, vec_a: &[f32], vec_b: &[f32]) -> f32 {
-        if self.config.use_simd && is_x86_feature_detected!("avx2") {
-            unsafe { self.cosine_similarity_simd(vec_a, vec_b) }
-        } else {
+        #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+        {
+            if self.config.use_simd && is_x86_feature_detected!("avx2") {
+                unsafe { self.cosine_similarity_simd(vec_a, vec_b) }
+            } else {
+                self.cosine_similarity_scalar(vec_a, vec_b)
+            }
+        }
+        #[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
+        {
             self.cosine_similarity_scalar(vec_a, vec_b)
         }
     }
 
     /// SIMD-optimized cosine similarity calculation
+    #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     #[target_feature(enable = "avx2")]
     unsafe fn cosine_similarity_simd(&self, vec_a: &[f32], vec_b: &[f32]) -> f32 {
         // Use SIMD instructions for vectorized operations
@@ -407,6 +422,7 @@ impl VectorOperations {
     }
 
     /// SIMD-optimized vector norm calculation
+    #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     #[target_feature(enable = "avx2")]
     unsafe fn vector_norm_simd(&self, vector: &[f32]) -> f32 {
         #[cfg(target_arch = "x86_64")]

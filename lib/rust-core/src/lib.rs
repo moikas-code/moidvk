@@ -39,8 +39,19 @@ pub fn get_version() -> napi::Result<String> {
 /// Returns JSON string with SIMD support, thread count, allocator info, etc.
 #[napi]
 pub fn get_performance_info() -> napi::Result<String> {
+    let simd_support = {
+        #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+        {
+            is_x86_feature_detected!("avx2")
+        }
+        #[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
+        {
+            false
+        }
+    };
+    
     let info = serde_json::json!({
-        "simd_support": is_x86_feature_detected!("avx2"),
+        "simd_support": simd_support,
         "parallel_threads": rayon::current_num_threads(),
         "allocator": "mimalloc",
         "optimization_level": if cfg!(debug_assertions) { "debug" } else { "release" }
