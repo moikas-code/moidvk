@@ -1,0 +1,60 @@
+[package]
+name = "moidvk-core"
+version = "0.1.0"
+edition = "2021"
+description = "High-performance Rust core for MOIDVK development tools"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# NAPI for Node.js bindings
+napi = { version = "2.16", default-features = false, features = ["napi4", "serde-json"] }
+napi-derive = "2.16"
+
+# Performance and parallel processing
+rayon = "1.8"           # Data parallelism
+crossbeam = "0.8"       # Lock-free data structures
+parking_lot = "0.12"    # High-performance synchronization
+
+# File system and I/O
+walkdir = "2.4"         # Fast directory traversal
+globset = "0.4"         # Glob pattern matching
+memmap2 = "0.9"         # Memory-mapped file I/O
+
+# String processing and regex
+regex = "1.10"          # Optimized regular expressions
+aho-corasick = "1.1"    # Multiple substring search
+unicode-normalization = "0.1"
+
+# Linear algebra and vector operations
+nalgebra = "0.32"       # Linear algebra library
+ndarray = "0.15"        # N-dimensional arrays
+simsimd = "4.3"         # SIMD-accelerated similarity metrics
+
+# Serialization and data handling
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Hash functions and cryptography
+blake3 = "1.5"          # Fast hashing
+seahash = "4.1"         # Fast non-cryptographic hash
+
+# Memory management and optimization
+mimalloc = { version = "0.1", default-features = false }
+
+[build-dependencies]
+napi-build = "2.1"
+
+[profile.release]
+# Optimize for performance
+lto = true              # Link-time optimization
+codegen-units = 1       # Single codegen unit for better optimization
+panic = "abort"         # Smaller binary size
+strip = true           # Strip symbols from binary
+
+[profile.dev]
+# Faster compilation during development
+opt-level = 1
+debug = true

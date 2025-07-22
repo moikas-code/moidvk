@@ -1,0 +1,11 @@
+/home/moika/Documents/code/moidvk/lib/rust-core/target/release/deps/napi_build-a88caf1d594a552f.d: /home/moika/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.2.2/src/lib.rs /home/moika/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.2.2/src/android.rs /home/moika/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.2.2/src/macos.rs /home/moika/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.2.2/src/wasi.rs /home/moika/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.2.2/src/windows.rs
+
+/home/moika/Documents/code/moidvk/lib/rust-core/target/release/deps/libnapi_build-a88caf1d594a552f.rlib: /home/moika/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.2.2/src/lib.rs /home/moika/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.2.2/src/android.rs /home/moika/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.2.2/src/macos.rs /home/moika/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.2.2/src/wasi.rs /home/moika/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.2.2/src/windows.rs
+
+/home/moika/Documents/code/moidvk/lib/rust-core/target/release/deps/libnapi_build-a88caf1d594a552f.rmeta: /home/moika/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.2.2/src/lib.rs /home/moika/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.2.2/src/android.rs /home/moika/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.2.2/src/macos.rs /home/moika/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.2.2/src/wasi.rs /home/moika/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.2.2/src/windows.rs
+
+/home/moika/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.2.2/src/lib.rs:
+/home/moika/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.2.2/src/android.rs:
+/home/moika/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.2.2/src/macos.rs:
+/home/moika/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.2.2/src/wasi.rs:
+/home/moika/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.2.2/src/windows.rs:

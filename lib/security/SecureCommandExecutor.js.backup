@@ -1,0 +1,512 @@
+import { spawn } from 'child_process';
+import { resolve, dirname, join, relative } from 'path';
+import { promises as fs } from 'fs';
+import { createHash } from 'crypto';
+
+/**
+ * Secure Command Executor for system tools like bash, grep, find
+ * Provides multi-layer security: validation, path restrictions, content filtering, auditing
+ */
+export class SecureCommandExecutor {
+  constructor(workspaceRoot = process.cwd(), options = {}) {
+    this.workspaceRoot = resolve(workspaceRoot);
+    this.options = {
+      securityLevel: 'BALANCED', // STRICT, BALANCED, PERMISSIVE
+      enableSandboxing: false,
+      enableAuditing: true,
+      enableContentFiltering: true,
+      maxOutputSize: 5 * 1024 * 1024, // 5MB
+      timeoutMs: 30000, // 30 seconds
+      policyManager: null, // UniversalSandbox instance for policy checks
+      ...options
+    };
+    
+    this.auditLog = [];
+    this.initializeSecurityConfig();
+  }
+  
+  /**
+   * Initialize security configuration based on security level
+   */
+  initializeSecurityConfig() {
+    const configs = {
+      STRICT: {
+        requireConsent: true,
+        commandWhitelist: 'minimal',
+        contentFiltering: true,
+        pathRestrictions: true,
+        allowedExtensions: ['.js', '.ts', '.json', '.md', '.txt', '.css', '.html']
+      },
+      BALANCED: {
+        requireConsent: false,
+        commandWhitelist: 'standard',
+        contentFiltering: true,
+        pathRestrictions: true,
+        allowedExtensions: ['.js', '.ts', '.jsx', '.tsx', '.json', '.md', '.txt', '.css', '.html', '.yml', '.yaml']
+      },
+      PERMISSIVE: {
+        requireConsent: false,
+        commandWhitelist: 'extended',
+        contentFiltering: false,
+        pathRestrictions: true,
+        allowedExtensions: null // All extensions allowed
+      }
+    };
+    
+    this.securityConfig = configs[this.options.securityLevel] || configs.BALANCED;
+  }
+  
+  /**
+   * Whitelisted commands and their allowed arguments
+   */
+  getAllowedCommands() {
+    const commands = {
+      minimal: {
+        'grep': ['-r', '-i', '-n', '--include', '--exclude', '-l', '-c'],
+        'find': ['-name', '-type', '-maxdepth'],
+        'ls': ['-la', '-lh'],
+        'cat': []
+      },
+      standard: {
+        'grep': ['-r', '-i', '-n', '--include', '--exclude', '-l', '-c', '-v', '-E', '-F'],
+        'find': ['-name', '-type', '-maxdepth', '-mtime', '-size'],
+        'ls': ['-la', '-lh', '-R', '-t'],
+        'cat': [],
+        'head': ['-n'],
+        'tail': ['-n'],
+        'wc': ['-l', '-w', '-c']
+      },
+      extended: {
+        'grep': ['-r', '-i', '-n', '--include', '--exclude', '-l', '-c', '-v', '-E', '-F', '-o', '-A', '-B', '-C'],
+        'find': ['-name', '-type', '-maxdepth', '-mtime', '-size', '-newer', '-exec'],
+        'ls': ['-la', '-lh', '-R', '-t', '-S'],
+        'cat': [],
+        'head': ['-n'],
+        'tail': ['-n', '-f'],
+        'wc': ['-l', '-w', '-c'],
+        'sort': ['-r', '-n', '-k'],
+        'uniq': ['-c']
+      }
+    };
+    
+    return commands[this.securityConfig.commandWhitelist] || commands.standard;
+  }
+  
+  /**
+   * Sensitive patterns for content filtering
+   */
+  getSensitivePatterns() {
+    return [
+      // API Keys and tokens
+      /api[_-]?key[_-]?[=:]\s*['""]?([a-zA-Z0-9]{20,})['""]?/gi,
+      /access[_-]?token[_-]?[=:]\s*['""]?([a-zA-Z0-9]{20,})['""]?/gi,
+      /secret[_-]?key[_-]?[=:]\s*['""]?([a-zA-Z0-9]{20,})['""]?/gi,
+      
+      // Passwords
+      /password[_-]?[=:]\s*['""]?([^'""\\s]{6,})['""]?/gi,
+      /passwd[_-]?[=:]\s*['""]?([^'""\\s]{6,})['""]?/gi,
+      
+      // Database URLs
+      /mongodb:\/\/[^\\s]+/gi,
+      /postgres:\/\/[^\\s]+/gi,
+      /mysql:\/\/[^\\s]+/gi,
+      
+      // Personal data
+      /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}/g, // emails
+      /\\b\\d{4}[-\\s]?\\d{4}[-\\s]?\\d{4}[-\\s]?\\d{4}\\b/g, // credit cards
+      /\\b\\d{3}-\\d{2}-\\d{4}\\b/g, // SSN
+      
+      // JWT tokens
+      /eyJ[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_=]+\\.?[A-Za-z0-9-_.+/=]*/g,
+      
+      // Private keys
+      /-----BEGIN [A-Z ]+-----[\\s\\S]*?-----END [A-Z ]+-----/gi,
+      
+      // AWS keys
+      /AKIA[0-9A-Z]{16}/g,
+      
+      // GitHub tokens
+      /ghp_[a-zA-Z0-9]{36}/g,
+      /gho_[a-zA-Z0-9]{36}/g,
+      /ghu_[a-zA-Z0-9]{36}/g
+    ];
+  }
+  
+  /**
+   * Blocked paths that should never be accessed
+   */
+  getBlockedPaths() {
+    return [
+      '.env',
+      '.env.local',
+      '.env.production',
+      '.env.development',
+      '.git/config',
+      '.ssh/',
+      'id_rsa',
+      'id_ed25519',
+      '.aws/credentials',
+      '.npmrc',
+      'package-lock.json', // Can contain private registry URLs
+      'yarn.lock',
+      '.docker/',
+      'docker-compose.yml',
+      'Dockerfile',
+      '/etc/passwd',
+      '/etc/shadow',
+      '/home/',
+      '/root/',
+      'node_modules/.cache',
+      '.cache/',
+      'tmp/',
+      'temp/'
+    ];
+  }
+  
+  /**
+   * Validate command and arguments
+   */
+  validateCommand(command, args) {
+    const allowedCommands = this.getAllowedCommands();
+    
+    if (!allowedCommands[command]) {
+      throw new Error(`Command '${command}' is not allowed. Allowed commands: ${Object.keys(allowedCommands).join(', ')}`);
+    }
+    
+    const allowedArgs = allowedCommands[command];
+    
+    // Check each argument
+    for (const arg of args) {
+      if (arg.startsWith('-')) {
+        // It's a flag
+        if (!allowedArgs.includes(arg)) {
+          throw new Error(`Argument '${arg}' is not allowed for command '${command}'`);
+        }
+      }
+      // Non-flag arguments (like file paths) are validated separately
+    }
+  }
+  
+  /**
+   * Extract file paths from command arguments
+   */
+  extractPaths(args) {
+    const paths = [];
+    
+    for (let i = 0; i < args.length; i++) {
+      const arg = args[i];
+      
+      // Skip flags
+      if (arg.startsWith('-')) {
+        // Some flags have values
+        if (arg === '--include' || arg === '--exclude' || arg === '-n') {
+          i++; // Skip the next argument (flag value)
+        }
+        continue;
+      }
+      
+      // This is likely a path
+      paths.push(arg);
+    }
+    
+    return paths;
+  }
+  
+  /**
+   * Validate file paths for security
+   */
+  async validatePath(inputPath) {
+    try {
+      // Resolve the path to handle relative paths and symlinks
+      const resolvedPath = resolve(this.workspaceRoot, inputPath);
+      
+      // Check if path is within workspace
+      if (!resolvedPath.startsWith(this.workspaceRoot)) {
+        throw new Error(`Access denied: Path '${inputPath}' is outside workspace`);
+      }
+      
+      // Check against blocked paths
+      const relativePath = relative(this.workspaceRoot, resolvedPath);
+      const blockedPaths = this.getBlockedPaths();
+      
+      for (const blocked of blockedPaths) {
+        if (relativePath.includes(blocked) || resolvedPath.includes(blocked)) {
+          throw new Error(`Access denied: Path '${inputPath}' contains blocked directory '${blocked}'`);
+        }
+      }
+      
+      // Check file extension if restrictions are enabled (only for files, not directories)
+      if (this.securityConfig.allowedExtensions) {
+        const lastDotIndex = inputPath.lastIndexOf('.');
+        const lastSlashIndex = Math.max(inputPath.lastIndexOf('/'), inputPath.lastIndexOf('\\'));
+        
+        // Only check extension if the dot comes after the last slash (it's a file extension, not part of a directory name)
+        if (lastDotIndex > lastSlashIndex && lastDotIndex !== -1) {
+          const ext = inputPath.slice(lastDotIndex);
+          
+          // Only restrict if it's actually a file extension (not just a dot)
+          if (ext.length > 1 && !this.securityConfig.allowedExtensions.includes(ext)) {
+            throw new Error(`Access denied: File extension '${ext}' is not allowed`);
+          }
+        }
+      }
+      
+      return resolvedPath;
+    } catch (error) {
+      throw new Error(`Path validation failed: ${error.message}`);
+    }
+  }
+  
+  /**
+   * Filter sensitive content from command output
+   */
+  redactSensitiveData(output) {
+    if (!this.securityConfig.contentFiltering) {
+      return output;
+    }
+    
+    let cleaned = output;
+    const patterns = this.getSensitivePatterns();
+    
+    patterns.forEach(pattern => {
+      cleaned = cleaned.replace(pattern, '[REDACTED]');
+    });
+    
+    return cleaned;
+  }
+  
+  /**
+   * Check if operation requires user consent
+   */
+  requiresConsent(command, paths) {
+    if (!this.securityConfig.requireConsent) {
+      return false;
+    }
+    
+    // Always require consent for certain commands
+    const sensitiveCommands = ['find', 'grep -r'];
+    if (sensitiveCommands.includes(command)) {
+      return true;
+    }
+    
+    // Require consent for operations on many files
+    if (paths.length > 10) {
+      return true;
+    }
+    
+    return false;
+  }
+  
+  /**
+   * Log command execution for audit trail
+   */
+  logExecution(command, args, paths, success, output = '', error = '') {
+    if (!this.options.enableAuditing) {
+      return;
+    }
+    
+    const logEntry = {
+      timestamp: new Date().toISOString(),
+      command,
+      args: args.join(' '),
+      paths: paths.map(p => relative(this.workspaceRoot, p)),
+      success,
+      outputSize: output.length,
+      errorMessage: error,
+      workspaceRoot: this.workspaceRoot,
+      securityLevel: this.options.securityLevel,
+      hash: createHash('sha256').update(`${command}${args.join('')}${Date.now()}`).digest('hex').slice(0, 8)
+    };
+    
+    this.auditLog.push(logEntry);
+    
+    // Keep only last 1000 entries
+    if (this.auditLog.length > 1000) {
+      this.auditLog.shift();
+    }
+  }
+  
+  /**
+   * Execute command securely
+   */
+  async executeCommand(command, args) {
+    return new Promise((resolve, reject) => {
+      const process = spawn(command, args, {
+        cwd: this.workspaceRoot,
+        stdio: ['pipe', 'pipe', 'pipe']
+      });
+      
+      let stdout = '';
+      let stderr = '';
+      
+      process.stdout.on('data', (data) => {
+        stdout += data.toString();
+        
+        // Check output size limit
+        if (stdout.length > this.options.maxOutputSize) {
+          process.kill();
+          reject(new Error('Output size limit exceeded'));
+        }
+      });
+      
+      process.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+      
+      // Set timeout
+      const timeout = setTimeout(() => {
+        process.kill();
+        reject(new Error('Command execution timeout'));
+      }, this.options.timeoutMs);
+      
+      process.on('close', (code) => {
+        clearTimeout(timeout);
+        
+        if (code === 0) {
+          resolve(stdout);
+        } else {
+          reject(new Error(`Command failed with code ${code}: ${stderr}`));
+        }
+      });
+      
+      process.on('error', (error) => {
+        clearTimeout(timeout);
+        reject(error);
+      });
+    });
+  }
+  
+  /**
+   * Main execution method with full security pipeline
+   */
+  async execute(command, args, options = {}) {
+    let paths = [];
+    let output = '';
+    let success = false;
+    
+    // Input validation with detailed error context
+    if (!command || typeof command !== 'string') {
+      throw new Error('INVALID_COMMAND: Command must be a non-empty string');
+    }
+    
+    if (!Array.isArray(args)) {
+      throw new Error('INVALID_ARGUMENT: Args must be an array');
+    }
+    
+    try {
+      // 0. Check with policy manager if available
+      if (this.options.policyManager) {
+        const policyResult = await this.options.policyManager.checkCommandPolicy(command, args);
+        if (!policyResult.action || policyResult.action === 'BLOCK') {
+          return {
+            success: false,
+            error: policyResult.reason || 'Command blocked by security policy',
+            policyResult,
+            command,
+            args
+          };
+        }
+        
+        // For commands requiring consent, return early
+        if (policyResult.action === 'CONSENT') {
+          return {
+            requiresConsent: true,
+            operation: `${command} ${args.join(' ')}`,
+            message: policyResult.reason || `Command '${command}' requires user consent`,
+            policyResult,
+            securityLevel: this.options.securityLevel
+          };
+        }
+      }
+
+      // 1. Validate command and arguments
+      this.validateCommand(command, args);
+      
+      // 2. Extract and validate file paths
+      paths = this.extractPaths(args);
+      for (const path of paths) {
+        await this.validatePath(path);
+      }
+      
+      // 3. Check user consent if required
+      if (this.requiresConsent(command, paths)) {
+        return {
+          requiresConsent: true,
+          operation: `${command} ${args.join(' ')}`,
+          paths: paths.map(p => relative(this.workspaceRoot, p)),
+          message: `Execute '${command}' on ${paths.length} file(s)?`,
+          securityLevel: this.options.securityLevel
+        };
+      }
+      
+      // 4. Execute command
+      output = await this.executeCommand(command, args);
+      
+      // 5. Filter sensitive content
+      const filtered = this.redactSensitiveData(output);
+      
+      success = true;
+      
+      // 6. Log execution
+      this.logExecution(command, args, paths, success, filtered);
+      
+      return {
+        success: true,
+        output: filtered,
+        command,
+        args,
+        paths: paths.map(p => relative(this.workspaceRoot, p)),
+        securityLevel: this.options.securityLevel,
+        contentFiltered: this.securityConfig.contentFiltering,
+        timestamp: new Date().toISOString()
+      };
+      
+    } catch (error) {
+      // Log failed execution with enhanced error information
+      const errorType = error.message.split(':')[0] || 'UNKNOWN_ERROR';
+      this.logExecution(command, args, paths, false, '', `${errorType}: ${error.message}`);
+      
+      // Enhance error with additional context
+      const enhancedError = new Error(`Secure execution failed: ${error.message}`);
+      enhancedError.type = errorType;
+      enhancedError.command = command;
+      enhancedError.args = args;
+      enhancedError.paths = paths;
+      enhancedError.securityLevel = this.options.securityLevel;
+      enhancedError.timestamp = new Date().toISOString();
+      
+      throw enhancedError;
+    }
+  }
+  
+  /**
+   * Get audit log
+   */
+  getAuditLog() {
+    return this.auditLog;
+  }
+  
+  /**
+   * Clear audit log
+   */
+  clearAuditLog() {
+    this.auditLog = [];
+  }
+  
+  /**
+   * Export audit log to file
+   */
+  async exportAuditLog(filePath) {
+    const logData = {
+      exported: new Date().toISOString(),
+      workspaceRoot: this.workspaceRoot,
+      securityLevel: this.options.securityLevel,
+      entries: this.auditLog
+    };
+    
+    await fs.writeFile(filePath, JSON.stringify(logData, null, 2));
+    return filePath;
+  }
+}
+
+export default SecureCommandExecutor;

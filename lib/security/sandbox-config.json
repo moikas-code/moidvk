@@ -1,0 +1,48 @@
+{
+  "security": {
+    "mode": "block",
+    "allowedDomains": [
+      "github.com",
+      "githubusercontent.com",
+      "npmjs.org",
+      "registry.npmjs.org",
+      "nodejs.org",
+      "deno.land",
+      "unpkg.com",
+      "cdn.jsdelivr.net",
+      "pypi.org",
+      "rubygems.org"
+    ],
+    "blockedPaths": [
+      "/",
+      "/etc",
+      "/usr",
+      "/bin",
+      "/sbin",
+      "/var",
+      "/sys",
+      "/proc",
+      "/boot",
+      "/dev",
+      "~/.ssh",
+      "~/.aws",
+      "~/.config"
+    ],
+    "customCommands": {
+      "allow": [],
+      "block": [],
+      "consent": []
+    },
+    "emergencyBypass": {
+      "enabled": false,
+      "requiresPassword": true,
+      "timeout": 60000
+    },
+    "auditLog": {
+      "enabled": true,
+      "maxSize": 10000,
+      "rotateDaily": true,
+      "location": "./logs/security-audit.log"
+    }
+  }
+}

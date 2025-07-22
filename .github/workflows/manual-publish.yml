@@ -1,0 +1,105 @@
+name: Manual Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g., 1.0.0)'
+        required: true
+        type: string
+      tag:
+        description: 'npm tag (latest, beta, alpha)'
+        required: false
+        default: 'latest'
+        type: choice
+        options:
+          - latest
+          - beta
+          - alpha
+      dry_run:
+        description: 'Dry run (test without publishing)'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  manual-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build project
+        run: bun run build:all
+
+      - name: Run tests
+        run: bun test
+
+      - name: Run linting
+        run: bun run lint
+
+      - name: Update package.json version
+        run: |
+          bun run --silent -e "
+            const pkg = require('./package.json');
+            pkg.version = '${{ github.event.inputs.version }}';
+            pkg.private = false;
+            require('fs').writeFileSync('./package.json', JSON.stringify(pkg, null, 2));
+          "
+
+      - name: Verify package contents
+        run: |
+          echo "Package contents:"
+          bun pack --dry-run
+
+      - name: Configure npm registry
+        if: ${{ !github.event.inputs.dry_run }}
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
+      - name: Publish to npm (dry run)
+        if: ${{ github.event.inputs.dry_run }}
+        run: |
+          echo "DRY RUN: Would publish version ${{ github.event.inputs.version }} with tag ${{ github.event.inputs.tag }}"
+          npm publish --dry-run --tag ${{ github.event.inputs.tag }}
+
+      - name: Publish to npm
+        if: ${{ !github.event.inputs.dry_run }}
+        run: |
+          npm publish --access public --tag ${{ github.event.inputs.tag }}
+
+      - name: Create git tag
+        if: ${{ !github.event.inputs.dry_run && github.event.inputs.tag == 'latest' }}
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git tag -a "v${{ github.event.inputs.version }}" -m "Release v${{ github.event.inputs.version }}"
+          git push origin "v${{ github.event.inputs.version }}"
+
+      - name: Summary
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "✅ Dry run completed successfully"
+            echo "📦 Package would be published as: moidvk@${{ github.event.inputs.version }}"
+            echo "🏷️ With tag: ${{ github.event.inputs.tag }}"
+          else
+            echo "✅ Package published successfully"
+            echo "📦 Published: moidvk@${{ github.event.inputs.version }}"
+            echo "🏷️ Tag: ${{ github.event.inputs.tag }}"
+            echo "🔗 View on npm: https://www.npmjs.com/package/moidvk"
+          fi

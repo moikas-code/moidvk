@@ -25,6 +25,7 @@ pub struct SecurityUtils;
 #[napi]
 impl SecurityUtils {
     #[napi(constructor)]
+    /// Create a new security utilities instance
     pub fn new() -> Self {
         Self
     }

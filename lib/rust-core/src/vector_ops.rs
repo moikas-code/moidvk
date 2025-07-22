@@ -66,7 +66,10 @@ pub struct VectorOperations {
 
 #[napi]
 impl VectorOperations {
-    /// Create a new vector operations instance
+    /// Create a new vector operations instance with optional configuration
+    /// 
+    /// # Arguments
+    /// * `config` - Optional configuration for vector operations
     #[napi(constructor)]
     pub fn new(config: Option<VectorConfig>) -> napi::Result<Self> {
         Ok(Self {

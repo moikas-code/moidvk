@@ -18,17 +18,25 @@ pub mod text_processing;
 pub mod security_utils;
 pub mod benchmarks;
 
-// Export the main initialization function
+/// Initialize the MOIDVK Rust core module
+/// 
+/// Returns a success message indicating the core has been initialized
 #[napi]
 pub fn initialize_rust_core() -> napi::Result<String> {
     Ok("MOIDVK Rust core initialized successfully".to_string())
 }
 
+/// Get the version of the MOIDVK core crate
+/// 
+/// Returns the version string from Cargo.toml
 #[napi]
 pub fn get_version() -> napi::Result<String> {
     Ok(env!("CARGO_PKG_VERSION").to_string())
 }
 
+/// Get performance information about the Rust runtime
+/// 
+/// Returns JSON string with SIMD support, thread count, allocator info, etc.
 #[napi]
 pub fn get_performance_info() -> napi::Result<String> {
     let info = serde_json::json!({

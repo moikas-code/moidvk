@@ -1,12 +1,10 @@
 #!/usr/bin/env node
-
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
   ListToolsRequestSchema,
   CallToolRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
-
 // Import existing JavaScript/TypeScript tools (from lib/tools/)
 import { codePracticesTool, handleCodePractices } from './lib/tools/code-practices.js';
 import { codeFormatterTool, handleCodeFormatter } from './lib/tools/code-formatter.js';
@@ -26,17 +24,25 @@ import {
   handleSemanticDevelopmentSearch
 } from './lib/tools/intelligent-tools.js';
 
+// Import new critical tools
+import { jsTestAnalyzerTool, handleJSTestAnalyzer } from './lib/tools/js-test-analyzer.js';
+import { bundleAnalyzerTool, handleBundleAnalyzer } from './lib/tools/bundle-analyzer.js';
+import { containerSecurityTool, handleContainerSecurity } from './lib/tools/container-security.js';
+import { documentationAnalyzerTool, handleDocumentationAnalyzer } from './lib/tools/documentation-analyzer.js';
+import { openApiValidatorTool, handleOpenApiValidator } from './lib/tools/openapi-validator.js';
+
+// Import new medium-priority tools
+import { jsPerformanceAnalyzerTool, handleJSPerformanceAnalyzer } from './lib/tools/js-performance-analyzer.js';
+import { pythonPerformanceAnalyzerTool, handlePythonPerformanceAnalyzer } from './lib/python/python-performance-analyzer.js';
+import { cicdAnalyzerTool, handleCICDAnalyzer } from './lib/tools/cicd-analyzer.js';
+import { licenseComplianceScannerTool, handleLicenseComplianceScanner } from './lib/tools/license-scanner.js';
+import { envConfigValidatorTool, handleEnvConfigValidator } from './lib/tools/env-config-validator.js';
+
 // Import security tools
 import { secureBashTool, handleSecureBash } from './lib/security/secure-bash.js';
-import { secureGrepTool, handleSecureGrep } from './lib/security/secure-grep.js';
 import { initializeSecurity } from './lib/security/security-init.js';
-
 // Import integration manager
 import { getIntegrationManager } from './lib/integration/integration-manager.js';
-
-// Import filesystem tools
-import { FilesystemToolsuite } from './lib/filesystem/filesystem-tools.js';
-
 // Import Rust tools (from lib/rust/)
 import { rustCodePracticesTool, handleRustCodePractices } from './lib/rust/rust-code-practices.js';
 import { rustFormatterTool, handleRustFormatter } from './lib/rust/rust-formatter.js';
@@ -44,7 +50,6 @@ import { rustSafetyCheckerTool, handleRustSafetyChecker } from './lib/rust/rust-
 import { rustSecurityScannerTool, handleRustSecurityScanner } from './lib/rust/rust-security-scanner.js';
 import { rustProductionReadinessTool, handleRustProductionReadiness } from './lib/rust/rust-production-readiness.js';
 import { rustPerformanceAnalyzerTool, handleRustPerformanceAnalyzer } from './lib/rust/rust-performance-analyzer.js';
-
 // Import Python tools (from lib/python/)
 import { pythonCodeAnalyzerTool, handlePythonCodeAnalyzer } from './lib/python/python-code-analyzer.js';
 import { pythonFormatterTool, handlePythonFormatter } from './lib/python/python-formatter.js';
@@ -52,7 +57,6 @@ import { pythonTypeCheckerTool, handlePythonTypeChecker } from './lib/python/pyt
 import { pythonSecurityScannerTool, handlePythonSecurityScanner } from './lib/python/python-security-scanner.js';
 import { pythonTestAnalyzerTool, handlePythonTestAnalyzer } from './lib/python/python-test-analyzer.js';
 import { pythonDependencyScannerTool, handlePythonDependencyScanner } from './lib/python/python-dependency-scanner.js';
-
 // Import Git tools (from lib/git/)
 import { gitBlameAnalyzerTool, handleGitBlameAnalyzer } from './lib/git/git-blame-analyzer.js';
 
@@ -82,14 +86,6 @@ class MOIDVKServer {
       this.securitySandbox = null;
     }
 
-    // Initialize filesystem tools
-    try {
-      this.fsTools = new FilesystemToolsuite();
-    } catch (error) {
-      console.error('[MOIDVK] Filesystem tools initialization failed:', error.message);
-      this.fsTools = null;
-    }
-
     // Initialize integration manager (will be initialized in run() method)
     this.integrationManager = null;
 
@@ -109,7 +105,20 @@ class MOIDVKServer {
       ['development_session_manager', handleDevelopmentSessionManager],
       ['semantic_development_search', handleSemanticDevelopmentSearch],
       ['secure_bash', handleSecureBash],
-      ['secure_grep', handleSecureGrep],
+      
+      // New critical tools
+      ['js_test_analyzer', handleJSTestAnalyzer],
+      ['bundle_size_analyzer', handleBundleAnalyzer],
+      ['container_security_scanner', handleContainerSecurity],
+      ['documentation_quality_checker', handleDocumentationAnalyzer],
+      ['openapi_rest_validator', handleOpenApiValidator],
+      
+      // New medium-priority tools
+      ['js_performance_analyzer', handleJSPerformanceAnalyzer],
+      ['python_performance_analyzer', handlePythonPerformanceAnalyzer],
+      ['cicd_configuration_analyzer', handleCICDAnalyzer],
+      ['license_compliance_scanner', handleLicenseComplianceScanner],
+      ['environment_config_validator', handleEnvConfigValidator],
       
       // Rust tools
       ['rust_code_practices', handleRustCodePractices],
@@ -150,7 +159,20 @@ class MOIDVKServer {
       developmentSessionManagerTool,
       semanticDevelopmentSearchTool,
       secureBashTool,
-      secureGrepTool,
+      
+      // New critical tools
+      jsTestAnalyzerTool,
+      bundleAnalyzerTool,
+      containerSecurityTool,
+      documentationAnalyzerTool,
+      openApiValidatorTool,
+      
+      // New medium-priority tools
+      jsPerformanceAnalyzerTool,
+      pythonPerformanceAnalyzerTool,
+      cicdAnalyzerTool,
+      licenseComplianceScannerTool,
+      envConfigValidatorTool,
       
       // Rust tools
       rustCodePracticesTool,
@@ -170,11 +192,7 @@ class MOIDVKServer {
       
       // Git tools
       gitBlameAnalyzerTool,
-      
-      // Filesystem tools
-      ...(this.fsTools ? this.fsTools.getTools() : []),
     ];
-
     return tools;
   }
 
@@ -199,30 +217,6 @@ class MOIDVKServer {
       
       console.error(`[MOIDVK] Tool called: ${name}`);
       
-      // Check if it's a filesystem tool first
-      if (this.fsTools) {
-        const fsTool = this.fsTools.getTools().find(t => t.name === name);
-        if (fsTool) {
-          try {
-            const result = await this.fsTools.handleToolCall(name, args || {});
-            console.error(`[MOIDVK] Tool ${name} completed successfully`);
-            return result;
-          } catch (error) {
-            console.error(`[MOIDVK] Error in tool ${name}:`, error);
-            return {
-              content: [{
-                type: 'text',
-                text: JSON.stringify({
-                  error: `Tool execution failed: ${error.message}`,
-                  tool: name,
-                  timestamp: new Date().toISOString()
-                }, null, 2)
-              }]
-            };
-          }
-        }
-      }
-
       // Check regular tool handlers
       const handler = this.toolHandlers.get(name);
       if (!handler) {
@@ -259,68 +253,23 @@ class MOIDVKServer {
         process.exit(1);
       });
 
-      process.on('unhandledRejection', (reason, promise) => {
-        console.error('[MOIDVK] Unhandled rejection at:', promise, 'reason:', reason);
+      process.on('unhandledRejection', (reason) => {
+        console.error('[MOIDVK] Unhandled rejection:', reason);
         process.exit(1);
       });
 
-      // Initialize integration manager
+      // Initialize integration manager with KB-MCP if available
       try {
         this.integrationManager = getIntegrationManager();
         await this.integrationManager.initialize();
         console.error('[MOIDVK] Integration manager initialized');
       } catch (error) {
         console.error('[MOIDVK] Integration manager initialization failed:', error.message);
-        this.integrationManager = null;
+        // Continue without integration manager
       }
 
-      // Connect to transport
       await this.server.connect(transport);
-      
-      // Set up graceful shutdown
-      process.on('SIGINT', async () => {
-        try {
-          if (this.integrationManager) {
-            await this.integrationManager.shutdown();
-          }
-          await this.server.close();
-        } catch (error) {
-          console.error('[MOIDVK] Error during shutdown:', error.message);
-        }
-        process.exit(0);
-      });
-
-      process.on('SIGTERM', async () => {
-        try {
-          if (this.integrationManager) {
-            await this.integrationManager.shutdown();
-          }
-          await this.server.close();
-        } catch (error) {
-          console.error('[MOIDVK] Error during shutdown:', error.message);
-        }
-        process.exit(0);
-      });
-      
-      console.error('[MOIDVK] Intelligent Development and Deployment MCP Server running on stdio');
-      console.error('[MOIDVK] Available languages: JavaScript/TypeScript, Rust, Python');
-      console.error('[MOIDVK] Total tools available:', this.getTools().length);
-      console.error('[MOIDVK] Tool categories:');
-      console.error('  - Code Analysis & Quality');
-      console.error('  - Code Formatting');
-      console.error('  - Security Scanning');
-      console.error('  - Safety & Production Readiness');
-      console.error('  - Type Checking (Python)');
-      console.error('  - Testing & Coverage (Python)');
-      console.error('  - Dependency Management');
-      console.error('  - Performance Analysis (Rust)');
-      console.error('  - Accessibility (JS/TS)');
-      console.error('  - GraphQL Tools');
-      console.error('  - Redux Patterns');
-      console.error('  - Intelligent Development');
-      console.error('  - File Operations');
-      console.error('  - Git Integration');
-      console.error('  - Secure Command Execution');
+      console.error('[MOIDVK] Server running with 37 tools available');
       
     } catch (error) {
       console.error('[MOIDVK] Failed to start server:', error.message);
@@ -329,9 +278,5 @@ class MOIDVKServer {
   }
 }
 
-// Run the server
 const server = new MOIDVKServer();
-server.run().catch(error => {
-  console.error('[MOIDVK] Fatal error:', error.message);
-  process.exit(1);
-});
+server.run().catch(console.error);

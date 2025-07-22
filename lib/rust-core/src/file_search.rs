@@ -110,7 +110,10 @@ pub struct FileSearch {
 
 #[napi]
 impl FileSearch {
-    /// Create a new file search instance
+    /// Create a new file search instance with optional configuration
+    /// 
+    /// # Arguments
+    /// * `config` - Optional configuration for file search operations
     #[napi(constructor)]
     pub fn new(config: Option<FileSearchConfig>) -> napi::Result<Self> {
         Ok(Self {

@@ -53,6 +53,7 @@ pub struct TextProcessor {
 #[napi]
 impl TextProcessor {
     #[napi(constructor)]
+    /// Create a new text processing instance with optional configuration
     pub fn new(config: Option<TextProcessingConfig>) -> Self {
         Self {
             config: config.unwrap_or_default(),

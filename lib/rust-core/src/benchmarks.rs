@@ -31,6 +31,7 @@ pub struct BenchmarkSuite {
 #[napi]
 impl BenchmarkSuite {
     #[napi(constructor)]
+    /// Create a new benchmark runner instance
     pub fn new() -> Self {
         Self {
             results: Vec::new(),
