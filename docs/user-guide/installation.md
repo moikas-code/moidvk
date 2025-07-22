@@ -1,193 +1,188 @@
 # Installation Guide
 
-This comprehensive guide covers installation and setup for MOIDVK across different platforms and MCP clients.
+This guide covers all installation methods for MOIDVK across different platforms and environments.
 
-## 📋 System Requirements
+## 📋 Prerequisites
 
-### Minimum Requirements
-- **Operating System**: macOS 10.15+, Windows 10+, or Linux (Ubuntu 18.04+)
-- **Node.js**: 18.0.0 or higher
-- **Bun**: 1.0.0 or higher
-- **Memory**: 4GB RAM minimum (8GB recommended)
-- **Storage**: 2GB free space
-- **Network**: Internet connection for initial setup
+### System Requirements
 
-### Recommended Requirements
-- **Operating System**: Latest stable version
-- **Node.js**: 20.0.0 or higher
-- **Bun**: Latest stable version
-- **Memory**: 8GB RAM or higher
-- **Storage**: 5GB free space
-- **Network**: Stable internet connection
+- **Operating System**: Linux, macOS, or Windows
+- **Memory**: Minimum 2GB RAM, 4GB recommended
+- **Storage**: 500MB free space for installation
+- **Network**: Internet connection for initial setup and updates
 
-## 🚀 Installation Methods
+### Runtime Requirements
 
-### Method 1: Install from Source (Recommended)
+- **Bun** v1.0+ (recommended) or **Node.js** v18+
+- **Rust** v1.70+ (for building native components)
+- **Python** v3.8+ (optional, for Python tool integration)
 
-```bash
-# Clone the repository
-git clone https://github.com/your-org/moidvk.git
-cd moidvk
+## 🚀 Quick Installation
 
-# Install dependencies using Bun
-bun install
+### Using Bun (Recommended)
 
-# Create a global link
-bun link
-
-# Verify the CLI is available
-moidvk --help
-```
-
-### Method 2: Global Installation via Package Manager
-
-#### Using Bun (Recommended)
 ```bash
 # Install globally
-bun install -g moidvk
+bun install -g @moikas/moidvk
 
 # Verify installation
 moidvk --version
 ```
 
-#### Using npm
+### Using npm
+
 ```bash
 # Install globally
-npm install -g moidvk
+npm install -g @moikas/moidvk
 
 # Verify installation
 moidvk --version
 ```
 
-### Method 3: Docker Installation
+### Using yarn
 
-```dockerfile
-FROM oven/bun:latest
-WORKDIR /app
-COPY package.json bun.lock ./
-RUN bun install
-COPY . .
-RUN bun run build
-EXPOSE 3000
-ENTRYPOINT ["bun", "run", "serve"]
+```bash
+# Install globally
+yarn global add @moikas/moidvk
+
+# Verify installation
+moidvk --version
 ```
 
-## 🔧 Platform-Specific Instructions
+## 🔧 Platform-Specific Installation
 
-### macOS Installation
+### Linux (Ubuntu/Debian)
 
-#### Using Homebrew (Recommended)
 ```bash
-# Install Bun via Homebrew
-brew install bun
-
-# Install MOIDVK
-bun install -g moidvk
-```
-
-#### Manual Installation
-```bash
-# Install Bun
+# Install Bun (if not already installed)
 curl -fsSL https://bun.sh/install | bash
 
-# Add to PATH (add to ~/.zshrc or ~/.bash_profile)
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
+# Install Rust (if not already installed)
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 # Install MOIDVK
-bun install -g moidvk
+bun install -g @moikas/moidvk
 ```
 
-### Windows Installation
+### macOS
 
-#### Using Chocolatey
 ```bash
-# Install Bun
-choco install bun
+# Install Bun using Homebrew
+brew install oven-sh/bun/bun
+
+# Install Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 # Install MOIDVK
-bun install -g moidvk
+bun install -g @moikas/moidvk
 ```
 
-#### Using PowerShell
-```bash
+### Windows
+
+```powershell
 # Install Bun
 powershell -c "irm bun.sh/install.ps1 | iex"
 
+# Install Rust
+# Download and run rustup-init.exe from https://rustup.rs/
+
 # Install MOIDVK
-bun install -g moidvk
+bun install -g @moikas/moidvk
 ```
 
-### Linux Installation
+## 🏗️ Building from Source
 
-#### Ubuntu/Debian
+### Clone and Build
+
 ```bash
-# Install Bun
-curl -fsSL https://bun.sh/install | bash
+# Clone the repository
+git clone https://github.com/moikas-code/moidvk.git
+cd moidvk
 
-# Add to PATH
-echo 'export BUN_INSTALL="$HOME/.bun"' >> ~/.bashrc
-echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
+# Install dependencies
+bun install
 
-# Install MOIDVK
-bun install -g moidvk
+# Build Rust components
+bun run build:rust
+
+# Build NAPI bindings
+bun run build:napi
+
+# Install globally from source
+bun link
 ```
 
-## 🖥️ MCP Client Setup
+### Development Build
 
-### Claude Desktop Configuration
+```bash
+# Clone repository
+git clone https://github.com/moikas-code/moidvk.git
+cd moidvk
 
-#### Prerequisites
-1. Claude Desktop installed and running
-2. MOIDVK installed on your system
-3. Bun installed on your system
+# Install dependencies
+bun install
 
-#### Configuration Steps
+# Build in development mode
+bun run build:rust:debug
+bun run build:napi:debug
 
-1. **Locate Claude Desktop Settings**
-   - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-   - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-   - **Linux**: `~/.config/Claude/claude_desktop_config.json`
+# Start development server
+bun run dev
+```
 
-2. **Add MCP Server Configuration**
-   ```json
-   {
-     "mcpServers": {
-       "moidvk": {
-         "command": "moidvk",
-         "args": ["serve"],
-         "env": {}
-       }
-     }
-   }
-   ```
+## 🐳 Docker Installation
 
-3. **Alternative Configuration (Direct Path)**
-   ```json
-   {
-     "mcpServers": {
-       "moidvk": {
-         "command": "bun",
-         "args": ["run", "/absolute/path/to/@moidvk/server.js"],
-         "env": {}
-       }
-     }
-   }
-   ```
+### Using Docker
 
-4. **Restart Claude Desktop**
+```bash
+# Pull the official image
+docker pull moikas/moidvk:latest
 
-#### Verifying Claude Desktop Connection
-1. Open Claude Desktop
-2. Start a new conversation
-3. Ask: "Can you check if this JavaScript code follows best practices?"
-4. Provide some JavaScript code
-5. Claude should use the `check_code_practices` tool automatically
+# Run as MCP server
+docker run -p 3000:3000 moikas/moidvk:latest serve
 
-### Cursor Configuration
+# Run with volume mount for project analysis
+docker run -v $(pwd):/workspace moikas/moidvk:latest analyze /workspace
+```
 
-#### Recommended Configuration (Simple)
+### Docker Compose
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+services:
+  moidvk:
+    image: moikas/moidvk:latest
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./:/workspace
+    command: serve
+    environment:
+      - MOIDVK_LOG_LEVEL=info
+```
+
+## 🔧 Post-Installation Setup
+
+### Verify Installation
+
+```bash
+# Check version
+moidvk --version
+
+# Test MCP server
+moidvk serve --test
+
+# Run diagnostics
+moidvk doctor
+```
+
+### Configure MCP Client
+
+#### Claude Desktop
+
+Add to your Claude Desktop configuration:
+
 ```json
 {
   "mcpServers": {
@@ -200,280 +195,191 @@ bun install -g moidvk
 }
 ```
 
-#### Configuration Steps
-1. **Locate your Cursor MCP configuration file:**
-   - Usually at: `~/.config/cursor/mcp.json`
-   - Or sometimes: `~/.cursor/mcp.json`
+#### VS Code with MCP Extension
 
-2. **Add the moidvk server configuration using the simple command above**
-
-#### Alternative Configurations
-
-**Direct server.js approach:**
 ```json
 {
-  "mcpServers": {
-    "moidvk": {
-      "command": "/Users/username/.bun/bin/bun",
-      "args": ["run", "/Users/username/Documents/code/@moidvk/server.js"],
-      "env": {
-        "MCP_SECURITY_MODE": "block",
-        "MCP_SECURITY_ENABLED": "true"
-      }
+  "mcp.servers": [
+    {
+      "name": "moidvk",
+      "command": "moidvk serve",
+      "description": "MOIDVK - The Ultimate DevKit"
     }
-  }
+  ]
 }
 ```
 
-**Using npm/node instead of bun:**
-```json
-{
-  "mcpServers": {
-    "moidvk": {
-      "command": "node",
-      "args": ["/path/to/@moidvk/server.js"],
-      "env": {
-        "MCP_SECURITY_MODE": "block"
-      }
-    }
-  }
-}
-```
+## 🔍 Troubleshooting Installation
 
-**Using npx:**
-```json
-{
-  "mcpServers": {
-    "moidvk": {
-      "command": "npx",
-      "args": ["moidvk"],
-      "cwd": "/path/to/@moidvk"
-    }
-  }
-}
-```
+### Common Issues
 
-#### Verifying Cursor Connection
-Once configured, restart Cursor and check if the moidvk tools appear:
-- Look for tools like: `check_code_practices`, `format_code`, `check_safety_rules`, etc.
-- Try using a tool: "Check this code with moidvk: console.log('test')"
+#### Rust Build Failures
 
-### VS Code Configuration
-
-1. **Install MCP Extension**
-2. **Open Settings** (Cmd/Ctrl + ,)
-3. **Search for "mcp"**
-4. **Add Configuration:**
-   ```json
-   {
-     "mcp.servers": {
-       "moidvk": {
-         "command": "moidvk",
-         "args": ["serve"]
-       }
-     }
-   }
-   ```
-5. **Restart VS Code**
-
-## ✅ Verification and Testing
-
-### Basic Verification
 ```bash
-# Check installation
-moidvk --version
+# Update Rust toolchain
+rustup update
 
-# Check dependencies
-bun list
+# Install required targets
+rustup target add x86_64-unknown-linux-gnu
 
-# Run tests
-bun test
+# Clear cache and rebuild
+cargo clean
+bun run build:rust
 ```
 
-### Integration Testing
+#### Permission Errors
+
 ```bash
-# Test MCP server
-bun run dev
+# Fix npm permissions (Linux/macOS)
+sudo chown -R $(whoami) ~/.npm
+sudo chown -R $(whoami) ~/.bun
 
-# In another terminal, test CLI
-echo "const x = 1" | moidvk check-code
-
-# Test code formatting
-echo "const x=1;const y=2;" | moidvk format
-
-# Test security scanning
-moidvk scan-security
+# Use npx for one-time execution
+npx @moikas/moidvk serve
 ```
 
-### Manual Integration Test
+#### Native Module Issues
+
 ```bash
-# Run comprehensive test
-bun run test/manual-test.js
-```
+# Rebuild native modules
+bun run build:napi
 
-## 🔧 Configuration
+# Check system compatibility
+moidvk doctor --verbose
 
-### Global Configuration
-Create `~/.moidvk/config.json`:
-```json
-{
-  "defaults": {
-    "security_level": "balanced",
-    "explicit_consent": true,
-    "max_file_size": 10485760,
-    "timeout": 30000
-  },
-  "tools": {
-    "check_code_practices": {
-      "production": false,
-      "strict": false
-    },
-    "format_code": {
-      "check_only": false
-    }
-  }
-}
-```
-
-### Project-Specific Configuration
-Create `.moidvk.json` in your project root:
-```json
-{
-  "project": {
-    "name": "my-project",
-    "security_level": "strict",
-    "explicit_consent": true
-  },
-  "tools": {
-    "check_code_practices": {
-      "production": true,
-      "strict": true
-    }
-  }
-}
-```
-
-## 🚨 Troubleshooting
-
-### Common Installation Issues
-
-#### "Command not found: moidvk"
-```bash
-# Check if bun is in PATH
-which bun
-
-# Reinstall globally
-bun install -g moidvk
-
-# Check installation location
-bun pm bin
-```
-
-#### "Permission denied"
-```bash
-# Fix permissions
-chmod +x bin/moidvk
-
-# Or install with sudo (not recommended)
-sudo bun install -g moidvk
-```
-
-#### "Module not found" errors
-```bash
-# Clear cache and reinstall
-bun pm cache rm
-bun install
-
-# Check node_modules
-ls node_modules
-```
-
-### MCP Client Connection Issues
-
-#### Server Not Connecting
-1. Check the path in your configuration is absolute, not relative
-2. Ensure the server.js file exists at the specified path
-3. Verify Bun is installed and available in your PATH
-4. Check MCP client logs for error messages
-
-#### Permission Issues
-On macOS/Linux, ensure the server.js file has execute permissions:
-```bash
-chmod +x /path/to/@moidvk/server.js
-```
-
-#### Viewing Logs
-To see server logs, you can run the server manually:
-```bash
-cd /path/to/@moidvk
-bun run server.js
+# Use JavaScript fallback
+MOIDVK_USE_JS_FALLBACK=true moidvk serve
 ```
 
 ### Platform-Specific Issues
 
-#### macOS Issues
-```bash
-# Fix Homebrew permissions
-sudo chown -R $(whoami) /usr/local/bin /usr/local/lib /usr/local/sbin
-chmod u+w /usr/local/bin /usr/local/lib /usr/local/sbin
+#### Linux: Missing Dependencies
 
-# Reinstall Bun
-brew uninstall bun
-brew install bun
+```bash
+# Ubuntu/Debian
+sudo apt-get update
+sudo apt-get install build-essential pkg-config libssl-dev
+
+# CentOS/RHEL
+sudo yum groupinstall "Development Tools"
+sudo yum install openssl-devel
 ```
 
-#### Windows Issues
-```bash
-# Run PowerShell as Administrator
-# Set execution policy
-Set-ExecutionPolicy RemoteSigned
+#### macOS: Xcode Command Line Tools
 
-# Reinstall Bun
-irm bun.sh/install.ps1 | iex
+```bash
+# Install Xcode command line tools
+xcode-select --install
+
+# Update if already installed
+sudo xcode-select --reset
 ```
 
-#### Linux Issues
-```bash
-# Fix PATH issues
-echo 'export BUN_INSTALL="$HOME/.bun"' >> ~/.bashrc
-echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
+#### Windows: Visual Studio Build Tools
 
-# Check permissions
-ls -la ~/.bun/bin
+```powershell
+# Install Visual Studio Build Tools
+# Download from: https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022
+
+# Or use chocolatey
+choco install visualstudio2022buildtools
 ```
 
-### Debug Mode
-Enable debug mode for detailed troubleshooting:
+## 🔄 Updating MOIDVK
+
+### Automatic Updates
+
 ```bash
-# Enable debug logging
-DEBUG=true moidvk check-code -f app.js
+# Update to latest version
+bun update -g @moikas/moidvk
 
-# Verbose output
-moidvk check-code -f app.js --debug
+# Check for updates
+moidvk update --check
 
-# Check server logs
-moidvk serve --debug
+# Update with automatic rebuild
+moidvk update --rebuild
 ```
 
-## 📚 Next Steps
+### Manual Updates
 
-After successful installation:
+```bash
+# Uninstall current version
+bun remove -g @moikas/moidvk
 
-1. **Read the [Getting Started Guide](getting-started.md)** - Get up and running quickly
-2. **Explore the tools** - Check [Tool Reference](tool-reference.md)
-3. **Set up your workflow** - Review [Workflow Examples](workflow-examples.md)
-4. **Configure security** - Review [Security Guide](security.md)
+# Install latest version
+bun install -g @moikas/moidvk@latest
+
+# Verify update
+moidvk --version
+```
+
+## 🗑️ Uninstallation
+
+### Complete Removal
+
+```bash
+# Uninstall package
+bun remove -g @moikas/moidvk
+
+# Remove configuration files
+rm -rf ~/.moidvk
+rm -rf ~/.config/moidvk
+
+# Remove cache
+rm -rf ~/.cache/moidvk
+```
+
+### Clean Reinstall
+
+```bash
+# Complete removal
+bun remove -g @moikas/moidvk
+rm -rf ~/.moidvk ~/.config/moidvk ~/.cache/moidvk
+
+# Fresh installation
+bun install -g @moikas/moidvk
+
+# Verify clean install
+moidvk doctor
+```
+
+## 📊 Installation Verification
+
+### Health Check
+
+```bash
+# Comprehensive system check
+moidvk doctor
+
+# Test all tools
+moidvk test --all
+
+# Performance benchmark
+moidvk benchmark --quick
+```
+
+### Expected Output
+
+```
+✅ MOIDVK v1.0.0 installed successfully
+✅ Rust core: Available (native)
+✅ Python tools: Available
+✅ MCP server: Ready
+✅ All 37 tools: Functional
+⚡ Performance: Optimal
+```
 
 ## 🆘 Getting Help
 
 If you encounter issues during installation:
 
 1. **Check the [Troubleshooting Guide](troubleshooting.md)**
-2. **Search existing issues** in the GitHub repository
-3. **Create a new issue** with detailed error information
-4. **Contact the support team** for urgent issues
+2. **Run diagnostics**: `moidvk doctor --verbose`
+3. **Check system requirements** above
+4. **Search [existing issues](https://github.com/moikas-code/moidvk/issues)**
+5. **Create a new issue** with diagnostic output
 
 ---
 
-**Installation Complete!** 🎉 Now proceed to the [Getting Started Guide](getting-started.md) to begin using MOIDVK.
+**Next Steps**: Once installed, check out the [Getting Started Guide](getting-started.md) to begin
+using MOIDVK.

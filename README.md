@@ -1,42 +1,51 @@
 # MOIDVK
+
 ## The Ultimate DevKit
 
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/moidvk/moidvk)
+[![Version](https://img.shields.io/badge/version-2.1.4-blue.svg)](https://github.com/moidvk/moidvk)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![MCP Server](https://img.shields.io/badge/MCP-Server-orange.svg)](https://modelcontextprotocol.io/)
 [![Built with Rust](https://img.shields.io/badge/built%20with-Rust-red.svg)](https://www.rust-lang.org/)
 [![Powered by Bun](https://img.shields.io/badge/powered%20by-Bun-yellow.svg)](https://bun.sh/)
 
-> **The Ultimate DevKit** - A comprehensive Model Context Protocol (MCP) server that unifies development best practices across JavaScript/TypeScript, Rust, and Python into a single, powerful toolkit.
+> **The Ultimate DevKit** - A comprehensive Model Context Protocol (MCP) server that unifies
+> development best practices across JavaScript/TypeScript, Rust, and Python into a single, powerful
+> toolkit.
 
-MOIDVK provides **37+ intelligent development tools** with security-first design, high-performance Rust core, and seamless integration with your favorite AI assistants and development environments.
+MOIDVK provides **37+ intelligent development tools** with security-first design, high-performance
+Rust core, and seamless integration with your favorite AI assistants and development environments.
 
 ## ✨ Key Features
 
 🚀 **Multi-Language Mastery**
+
 - **JavaScript/TypeScript**: ESLint analysis, Prettier formatting, accessibility checks
-- **Rust**: Clippy analysis, rustfmt formatting, performance optimization, safety checks  
+- **Rust**: Clippy analysis, rustfmt formatting, performance optimization, safety checks
 - **Python**: Ruff analysis, Black formatting, type checking, dependency scanning
 
 🔒 **Security-First Architecture**
+
 - Comprehensive vulnerability scanning across all languages
 - Production readiness validation
 - NASA JPL safety rule compliance checking
 - Secure command execution with sandbox isolation
 
 ⚡ **High-Performance Core**
+
 - Rust-powered vector operations and file search
 - NAPI bindings for seamless JavaScript integration
 - Local semantic embeddings for intelligent code search
 - Optimized algorithms for large codebases
 
 🧠 **Intelligent Development**
+
 - KB-MCP bidirectional integration for enhanced workflows
 - Semantic code search with contextual understanding
 - Development session management across tools
 - Intelligent tool routing and optimization
 
 🛠️ **Developer Experience**
+
 - 37+ tools in one unified MCP server
 - CLI interface for standalone usage
 - Comprehensive error handling and fallbacks
@@ -92,71 +101,80 @@ moidvk search-semantic -p /path/to/project --query "authentication logic"
 ## 🛠️ Tool Categories
 
 ### 🔍 Code Quality & Analysis
-| Tool | Language | Description |
-|------|----------|-------------|
-| `check_code_practices` | JS/TS | ESLint analysis with pagination and filtering |
-| `rust_code_practices` | Rust | Clippy analysis with configurable lint levels |
-| `python_code_analyzer` | Python | Ruff-powered analysis with comprehensive rules |
+
+| Tool                   | Language | Description                                    |
+| ---------------------- | -------- | ---------------------------------------------- |
+| `check_code_practices` | JS/TS    | ESLint analysis with pagination and filtering  |
+| `rust_code_practices`  | Rust     | Clippy analysis with configurable lint levels  |
+| `python_code_analyzer` | Python   | Ruff-powered analysis with comprehensive rules |
 
 ### 🎨 Code Formatting
-| Tool | Language | Description |
-|------|----------|-------------|
-| `format_code` | JS/TS/CSS/HTML/MD | Prettier formatting with project config |
-| `rust_formatter` | Rust | rustfmt with configurable style options |
-| `python_formatter` | Python | Black formatting with line length control |
+
+| Tool               | Language          | Description                               |
+| ------------------ | ----------------- | ----------------------------------------- |
+| `format_code`      | JS/TS/CSS/HTML/MD | Prettier formatting with project config   |
+| `rust_formatter`   | Rust              | rustfmt with configurable style options   |
+| `python_formatter` | Python            | Black formatting with line length control |
 
 ### 🔒 Security & Safety
-| Tool | Language | Description |
-|------|----------|-------------|
-| `scan_security_vulnerabilities` | All | Project dependency vulnerability scanning |
-| `check_safety_rules` | JS/TS | NASA JPL safety-critical programming rules |
-| `rust_safety_checker` | Rust | Memory safety and ownership validation |
-| `python_security_scanner` | Python | Bandit-powered security analysis |
+
+| Tool                            | Language | Description                                |
+| ------------------------------- | -------- | ------------------------------------------ |
+| `scan_security_vulnerabilities` | All      | Project dependency vulnerability scanning  |
+| `check_safety_rules`            | JS/TS    | NASA JPL safety-critical programming rules |
+| `rust_safety_checker`           | Rust     | Memory safety and ownership validation     |
+| `python_security_scanner`       | Python   | Bandit-powered security analysis           |
 
 ### 🚀 Production & Performance
-| Tool | Language | Description |
-|------|----------|-------------|
-| `check_production_readiness` | JS/TS | Production deployment validation |
-| `rust_production_readiness` | Rust | Production deployment best practices |
-| `rust_performance_analyzer` | Rust | Performance hotspot identification |
-| `python_test_analyzer` | Python | Test coverage and quality metrics |
+
+| Tool                         | Language | Description                          |
+| ---------------------------- | -------- | ------------------------------------ |
+| `check_production_readiness` | JS/TS    | Production deployment validation     |
+| `rust_production_readiness`  | Rust     | Production deployment best practices |
+| `rust_performance_analyzer`  | Rust     | Performance hotspot identification   |
+| `python_test_analyzer`       | Python   | Test coverage and quality metrics    |
 
 ### ♿ Accessibility & Standards
-| Tool | Technology | Description |
-|------|------------|-------------|
-| `check_accessibility` | HTML/JSX/CSS | WCAG 2.2 compliance validation |
-| `check_graphql_schema` | GraphQL | Schema validation and best practices |
-| `check_graphql_query` | GraphQL | Query complexity and security analysis |
-| `check_redux_patterns` | Redux | State management pattern validation |
+
+| Tool                   | Technology   | Description                            |
+| ---------------------- | ------------ | -------------------------------------- |
+| `check_accessibility`  | HTML/JSX/CSS | WCAG 2.2 compliance validation         |
+| `check_graphql_schema` | GraphQL      | Schema validation and best practices   |
+| `check_graphql_query`  | GraphQL      | Query complexity and security analysis |
+| `check_redux_patterns` | Redux        | State management pattern validation    |
 
 ### 🧠 Intelligent Development
-| Tool | Purpose | Description |
-|------|---------|-------------|
-| `intelligent_development_analysis` | Workflow | Optimal tool sequence orchestration |
-| `semantic_development_search` | Search | Context-aware code search with embeddings |
-| `development_session_manager` | Sessions | Cross-client development session management |
+
+| Tool                               | Purpose  | Description                                 |
+| ---------------------------------- | -------- | ------------------------------------------- |
+| `intelligent_development_analysis` | Workflow | Optimal tool sequence orchestration         |
+| `semantic_development_search`      | Search   | Context-aware code search with embeddings   |
+| `development_session_manager`      | Sessions | Cross-client development session management |
 
 ### 🔧 New Critical Tools
-| Tool | Purpose | Description |
-|------|---------|-------------|
-| `js_test_analyzer` | Testing | JavaScript/TypeScript test analysis and quality |
-| `bundle_size_analyzer` | Performance | Bundle size analysis and optimization |
-| `container_security_scanner` | Security | Docker/container security analysis |
-| `documentation_quality_checker` | Quality | Documentation analysis and completeness |
-| `openapi_rest_validator` | API | OpenAPI/REST API validation and compliance |
+
+| Tool                            | Purpose     | Description                                     |
+| ------------------------------- | ----------- | ----------------------------------------------- |
+| `js_test_analyzer`              | Testing     | JavaScript/TypeScript test analysis and quality |
+| `bundle_size_analyzer`          | Performance | Bundle size analysis and optimization           |
+| `container_security_scanner`    | Security    | Docker/container security analysis              |
+| `documentation_quality_checker` | Quality     | Documentation analysis and completeness         |
+| `openapi_rest_validator`        | API         | OpenAPI/REST API validation and compliance      |
 
 ### 🚀 New Performance & Infrastructure Tools
-| Tool | Purpose | Description |
-|------|---------|-------------|
-| `js_performance_analyzer` | Performance | JavaScript/TypeScript performance analysis and optimization |
-| `python_performance_analyzer` | Performance | Python performance hotspot detection and optimization |
-| `cicd_configuration_analyzer` | DevOps | CI/CD pipeline analysis for GitHub Actions, GitLab CI, Jenkins |
-| `license_compliance_scanner` | Compliance | License compatibility and compliance scanning |
-| `environment_config_validator` | Config | Environment configuration validation and security |
+
+| Tool                           | Purpose     | Description                                                    |
+| ------------------------------ | ----------- | -------------------------------------------------------------- |
+| `js_performance_analyzer`      | Performance | JavaScript/TypeScript performance analysis and optimization    |
+| `python_performance_analyzer`  | Performance | Python performance hotspot detection and optimization          |
+| `cicd_configuration_analyzer`  | DevOps      | CI/CD pipeline analysis for GitHub Actions, GitLab CI, Jenkins |
+| `license_compliance_scanner`   | Compliance  | License compatibility and compliance scanning                  |
+| `environment_config_validator` | Config      | Environment configuration validation and security              |
 
 ## 🏗️ Architecture
 
 ### High-Performance Core
+
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │   JavaScript    │    │    Rust Core     │    │   Python Tools  │
@@ -173,6 +191,7 @@ moidvk search-semantic -p /path/to/project --query "authentication logic"
 ```
 
 ### Integration Layer
+
 - **KB-MCP Bidirectional Integration**: Intelligent routing between MOIDVK and KB-MCP
 - **Semantic Search**: Local embeddings with cross-project intelligence
 - **Session Management**: Persistent development context across tools
@@ -189,6 +208,7 @@ moidvk search-semantic -p /path/to/project --query "authentication logic"
 ## 🔧 Configuration
 
 ### Basic Configuration (`.mcp.json`)
+
 ```json
 {
   "mcpServers": {
@@ -213,6 +233,7 @@ moidvk search-semantic -p /path/to/project --query "authentication logic"
 ```
 
 ### Advanced Features
+
 - **Intelligent Routing**: Automatic tool selection based on context
 - **Caching**: Result caching with configurable TTL
 - **Error Handling**: Comprehensive fallback mechanisms
@@ -221,11 +242,12 @@ moidvk search-semantic -p /path/to/project --query "authentication logic"
 ## 🤝 Integration Examples
 
 ### Claude Desktop
+
 ```json
 {
   "mcpServers": {
     "moidvk": {
-      "command": "moidvk", 
+      "command": "moidvk",
       "args": ["serve"]
     }
   }
@@ -233,6 +255,7 @@ moidvk search-semantic -p /path/to/project --query "authentication logic"
 ```
 
 ### VS Code with MCP Extension
+
 ```json
 {
   "mcp.servers": [
@@ -245,28 +268,31 @@ moidvk search-semantic -p /path/to/project --query "authentication logic"
 ```
 
 ### Programmatic Usage
+
 ```javascript
 import { createMCPClient } from '@modelcontextprotocol/client';
 
 const client = createMCPClient({
   command: 'moidvk',
-  args: ['serve']
+  args: ['serve'],
 });
 
 const result = await client.callTool('check_code_practices', {
   code: 'const x = 1;',
-  production: true
+  production: true,
 });
 ```
 
 ## 🚀 Development
 
 ### Prerequisites
+
 - **Bun** v1.0+ (recommended) or **Node.js** v18+
 - **Rust** v1.70+ (for building native components)
 - **Python** v3.8+ (for Python tool integration)
 
 ### Building from Source
+
 ```bash
 # Clone the repository
 git clone https://github.com/moidvk/moidvk
@@ -283,6 +309,7 @@ bun run dev
 ```
 
 ### Running Tests
+
 ```bash
 # Run comprehensive test suite
 bun test
@@ -294,6 +321,7 @@ bun test:javascript
 ```
 
 ### Project Structure
+
 ```
 moidvk/
 ├── lib/
@@ -320,6 +348,7 @@ moidvk/
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ### Development Workflow
+
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes with tests
@@ -327,6 +356,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 5. Submit a pull request
 
 ### Code Standards
+
 - All code must pass security scans
 - Maintain test coverage above 80%
 - Follow language-specific style guides
@@ -340,7 +370,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **[Model Context Protocol](https://modelcontextprotocol.io/)** - Foundation for tool integration
 - **[Bun](https://bun.sh/)** - Fast JavaScript runtime and toolkit
-- **[Rust](https://www.rust-lang.org/)** - Systems programming language for performance-critical components
+- **[Rust](https://www.rust-lang.org/)** - Systems programming language for performance-critical
+  components
 - **Community Contributors** - Thanks to all who make MOIDVK better
 
 ---
@@ -349,6 +380,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Built with ❤️ by the MOIDVK team**
 
-[Website](https://moidvk.dev) • [Documentation](docs/) • [Issues](https://github.com/moidvk/moidvk/issues) • [Discussions](https://github.com/moidvk/moidvk/discussions)
+[Website](https://moidvk.dev) • [Documentation](docs/) •
+[Issues](https://github.com/moidvk/moidvk/issues) •
+[Discussions](https://github.com/moidvk/moidvk/discussions)
 
 </div>

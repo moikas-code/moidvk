@@ -1,546 +1,429 @@
-# Getting Started Guide
+# Getting Started with MOIDVK
 
-Welcome to MOIDVK! This guide will walk you through your first steps with MOIDVK, from installation to running your first code analysis.
+Welcome to MOIDVK - The Ultimate DevKit! This guide will help you get up and running quickly with
+our comprehensive development toolkit.
 
-## 🎯 What You'll Learn
+## 🎯 What is MOIDVK?
 
-By the end of this guide, you'll be able to:
-- Install MOIDVK on your system
-- Configure it with your MCP client
-- Run your first code quality check
-- Understand the basic workflow
-- Troubleshoot common issues
-
-## 📋 Prerequisites
-
-Before you begin, make sure you have:
-
-- **Operating System**: macOS 10.15+, Windows 10+, or Linux (Ubuntu 18.04+)
-- **Bun**: Version 1.0.0 or higher
-- **MCP Client**: Claude Desktop, Cursor, or another MCP-compatible client
-- **Basic Command Line**: Familiarity with terminal/command prompt
-- **Internet Connection**: For initial setup and updates
+MOIDVK is a Model Context Protocol (MCP) server that provides 37+ intelligent development tools for
+JavaScript/TypeScript, Rust, and Python. It combines code analysis, security scanning, performance
+optimization, and intelligent development assistance into a single, powerful toolkit.
 
 ## 🚀 Quick Start (5 Minutes)
 
-### Step 1: Install MOIDVK
+### 1. Install MOIDVK
 
 ```bash
-# Install globally with Bun
-bun install -g moidvk
+# Using Bun (recommended)
+bun install -g @moikas/moidvk
 
 # Verify installation
 moidvk --version
 ```
 
-### Step 2: Configure Your MCP Client
-
-#### Claude Desktop
-```json
-{
-  "mcpServers": {
-    "moidvk": {
-      "command": "moidvk",
-      "args": ["serve"]
-    }
-  }
-}
-```
-
-#### Cursor
-```json
-{
-  "mcpServers": {
-    "moidvk": {
-      "command": "moidvk",
-      "args": ["serve"]
-    }
-  }
-}
-```
-
-### Step 3: Test Your Installation
+### 2. Start the MCP Server
 
 ```bash
-# Test basic functionality
-moidvk --help
-
-# Test code quality checking
-echo "const x = 1" | moidvk check-code
-
-# Test code formatting
-echo "const x=1;const y=2;" | moidvk format
-```
-
-### Step 4: Your First Code Analysis
-
-1. **Restart your MCP client**
-2. **Start a new conversation**
-3. **Test with a simple command**:
-
-```
-"Check this code for best practices:
-const x = 1
-if (x == '1') console.log('match')"
-```
-
-**Expected Response**: Claude should use the `check_code_practices` tool and provide feedback about using `===` instead of `==`.
-
-## 📚 First Steps (Detailed Walkthrough)
-
-### Installation Options
-
-#### Global Installation (Recommended)
-```bash
-# Install globally
-bun install -g moidvk
-
-# Verify installation
-moidvk --version
-```
-
-#### Local Installation
-```bash
-# Clone repository
-git clone https://github.com/your-org/moidvk.git
-cd moidvk
-
-# Install dependencies
-bun install
-
-# Create global link
-bun link
-
-# Verify installation
-moidvk --help
-```
-
-### MCP Client Configuration
-
-#### Claude Desktop Setup
-
-1. **Open Claude Desktop**
-2. **Go to Settings** (gear icon)
-3. **Navigate to MCP Servers**
-4. **Click Add Server**
-5. **Add Configuration**:
-
-```json
-{
-  "mcpServers": {
-    "moidvk": {
-      "command": "moidvk",
-      "args": ["serve"]
-    }
-  }
-}
-```
-
-6. **Restart Claude Desktop**
-
-#### Cursor Setup
-
-1. **Open Cursor**
-2. **Go to Settings** (Cmd/Ctrl + ,)
-3. **Navigate to Extensions → MCP**
-4. **Add Server Configuration**:
-
-```json
-{
-  "mcpServers": {
-    "moidvk": {
-      "command": "moidvk",
-      "args": ["serve"]
-    }
-  }
-}
-```
-
-5. **Restart Cursor**
-
-#### VS Code Setup
-
-1. **Install MCP Extension**
-2. **Open Settings** (Cmd/Ctrl + ,)
-3. **Search for "mcp"**
-4. **Add Configuration**:
-
-```json
-{
-  "mcp.servers": {
-    "moidvk": {
-      "command": "moidvk",
-      "args": ["serve"]
-    }
-  }
-}
-```
-
-5. **Restart VS Code**
-
-### Testing Your Setup
-
-#### Test via CLI
-
-```bash
-# Test basic functionality
-moidvk --help
-
-# Test code quality checking
-echo "const x = 1" | moidvk check-code
-
-# Test code formatting
-echo "const x=1;const y=2;" | moidvk format
-
-# Test server
-moidvk serve --test
-```
-
-#### Test via MCP Client
-
-1. **Restart your MCP client**
-2. **Start a new conversation**
-3. **Test with a simple command**:
-
-```
-"Check this code for best practices:
-const x = 1
-if (x == '1') console.log('match')"
-```
-
-**Expected Response**: Claude should use the `check_code_practices` tool and provide feedback about using `===` instead of `==`.
-
-## 🎯 Your First Workflow
-
-### Basic Code Quality Check
-
-Create a test file `test.js`:
-
-```javascript
-// test.js
-var x = 1;
-if (x == '1') {
-  console.log('match');
-}
-```
-
-**Check the code**:
-```
-"Check this code for best practices:
-var x = 1;
-if (x == '1') {
-  console.log('match');
-}"
-```
-
-**Expected Feedback**:
-- Use `const` instead of `var`
-- Use `===` instead of `==`
-- Remove `console.log` for production
-
-### Code Formatting
-
-**Format the code**:
-```
-"Format this code:
-var x = 1;if (x == '1') {console.log('match');}"
-```
-
-**Expected Output**:
-```javascript
-const x = 1;
-if (x === "1") {
-  console.log("match");
-}
-```
-
-### Production Readiness Check
-
-**Check production readiness**:
-```
-"Check if this code is production ready:
-const API_KEY = 'sk-1234'; // TODO: move to env
-console.log('Starting server...');
-function processPayment() { /* TODO: implement */ }"
-```
-
-**Expected Feedback**:
-- Hardcoded API key detected
-- Console.log statement found
-- TODO comment indicates incomplete implementation
-
-## 🛠️ Explore Available Tools
-
-### List Available Tools
-
-```
-"What MOIDVK tools are available to you?"
-```
-
-**Expected Response**: List of available tools including:
-- `check_code_practices`
-- `format_code`
-- `check_safety_rules`
-- `scan_security_vulnerabilities`
-- `check_production_readiness`
-- `check_accessibility`
-- `check_graphql_schema`
-- `check_graphql_query`
-- `check_redux_patterns`
-- Filesystem tools
-
-### Try Different Tools
-
-#### Safety Analysis
-```
-"Check this code for safety violations:
-function factorial(n) {
-  return n <= 1 ? 1 : n * factorial(n - 1);
-}"
-```
-
-#### Security Scanning
-```
-"Scan my project for security vulnerabilities"
-```
-
-#### Accessibility Testing
-```
-"Check this HTML for accessibility:
-<html><head><title>Test</title></head><body>
-<img src='logo.jpg'>
-<button>Click me</button>
-</body></html>"
-```
-
-## 📁 Filesystem Operations
-
-### Basic File Operations
-
-#### Create a File
-```
-"Create a file named config.js with content:
-export const API_URL = 'https://api.example.com';
-export const DEBUG = false;"
-```
-
-#### Read a File
-```
-"Read the file config.js"
-```
-
-#### Update a File
-```
-"Update config.js to change DEBUG to true"
-```
-
-#### List Directory
-```
-"List all files in the current directory"
-```
-
-### Search Operations
-
-#### Search for Files
-```
-"Search for all JavaScript files"
-```
-
-#### Search in Files
-```
-"Search for 'TODO' in all JavaScript files"
-```
-
-## 🔍 Understand the Results
-
-### Code Quality Results
-
-When you run a code quality check, you'll see:
-
-```
-🔍 Code Quality Analysis Results:
-
-✅ Passed: 2 checks
-⚠️ Warnings: 1 issue
-❌ Errors: 1 issue
-
-Issues Found:
-- Line 2: Use '===' instead of '==' for comparison (eqeqeq)
-- Line 3: Avoid console.log in production code (no-console)
-
-💡 Recommendations:
-- Use strict equality operators (===)
-- Remove debug statements before production
-```
-
-### Understanding Severity Levels
-
-- **✅ Passed**: Code follows best practices
-- **⚠️ Warnings**: Minor issues that should be fixed
-- **❌ Errors**: Issues that need immediate attention
-- **💡 Recommendations**: Suggestions for improvement
-
-### Understanding Tool Output
-
-Each tool provides:
-- **Summary**: Overview of results
-- **Issues**: Specific problems found
-- **Recommendations**: How to fix issues
-- **Score**: Numerical assessment (where applicable)
-
-## 🚨 Troubleshooting Common Issues
-
-### "Command not found"
-
-```bash
-# Check if bun is in PATH
-which bun
-
-# Add bun to PATH
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-
-# Reinstall MOIDVK
-bun install -g moidvk
-```
-
-### "MCP server connection failed"
-
-```bash
-# Check if server is running
+# Start the server
 moidvk serve
 
-# Check configuration
-# Verify MCP client configuration is correct
-# Restart MCP client
+# Server will start on default port with all tools available
 ```
 
-### "Permission denied"
+### 3. Configure Your MCP Client
 
-```bash
-# Fix permissions
-chmod +x $(which moidvk)
+#### Claude Desktop
 
-# Check ownership
-ls -la $(which moidvk)
-```
-
-### "Tool not available"
-
-```bash
-# Check available tools
-moidvk list-tools
-
-# Restart MCP client
-# Verify tool registration
-```
-
-## 📚 Next Steps
-
-### Explore Documentation
-
-1. **Read the [Tool Reference](tool-reference.md)** - Learn about all available tools
-2. **Check [Workflow Examples](workflow-examples.md)** - See real-world usage
-3. **Review [CLI Usage](cli-usage.md)** - Learn command-line options
-4. **Explore [Production Deployment](production-deployment.md)** - Prepare for production
-
-### Set Up Your Workflow
-
-#### Daily Development Workflow
-
-1. **Write Code** → Use your normal development process
-2. **Check Quality** → Run `check_code_practices` on new code
-3. **Format Code** → Use `format_code` for consistent style
-4. **Check Production** → Use `check_production_readiness` before deployment
-5. **Scan Security** → Use `scan_security_vulnerabilities` regularly
-
-#### Integration with Your Tools
-
-- **VS Code**: Set up tasks and keybindings
-- **Git Hooks**: Add pre-commit checks
-- **CI/CD**: Integrate into your build pipeline
-- **Code Reviews**: Use MOIDVK tools during reviews
-
-### Advanced Features
-
-#### Custom Configuration
-
-Create `.moidvk.json` in your project:
+Add to your `~/.config/claude-desktop/config.json`:
 
 ```json
 {
-  "project": {
-    "name": "my-project",
-    "security_level": "strict"
+  "mcpServers": {
+    "moidvk": {
+      "command": "moidvk",
+      "args": ["serve"],
+      "env": {}
+    }
+  }
+}
+```
+
+#### Other MCP Clients
+
+```json
+{
+  "servers": {
+    "moidvk": {
+      "command": "moidvk serve",
+      "description": "MOIDVK - The Ultimate DevKit"
+    }
+  }
+}
+```
+
+### 4. Test Your Setup
+
+```bash
+# Test the MCP server
+moidvk serve --test
+
+# Run a quick diagnostic
+moidvk doctor
+```
+
+## 🛠️ First Steps with Tools
+
+### Analyze JavaScript Code
+
+```bash
+# Create a test file
+echo "const x = 1; console.log(x);" > test.js
+
+# Analyze with MOIDVK
+moidvk check-code -f test.js
+```
+
+### Format Code
+
+```bash
+# Format JavaScript
+moidvk format -f test.js
+
+# Format Rust
+echo "fn main(){println!(\"Hello\");}" > test.rs
+moidvk rust-format -f test.rs
+```
+
+### Security Scan
+
+```bash
+# Scan project for vulnerabilities
+moidvk scan-security
+
+# Check production readiness
+moidvk check-production -f test.js
+```
+
+## 🎨 Using with MCP Clients
+
+### With Claude Desktop
+
+Once configured, you can use MOIDVK tools directly in Claude conversations:
+
+```
+User: "Analyze this JavaScript code for best practices"
+[paste your code]
+
+Claude: I'll analyze your code using MOIDVK's code practices checker...
+[uses check_code_practices tool]
+```
+
+### With VS Code MCP Extension
+
+1. Install the MCP extension for VS Code
+2. Add MOIDVK to your MCP configuration
+3. Use tools via the command palette or inline suggestions
+
+### Programmatic Usage
+
+```javascript
+import { createMCPClient } from '@modelcontextprotocol/client';
+
+const client = createMCPClient({
+  command: 'moidvk',
+  args: ['serve'],
+});
+
+// Analyze code
+const result = await client.callTool('check_code_practices', {
+  code: 'const x = 1;',
+  production: true,
+});
+
+console.log(result);
+```
+
+## 🔧 Essential Tools Overview
+
+### Code Quality Tools
+
+- **`check_code_practices`** - ESLint analysis for JavaScript/TypeScript
+- **`rust_code_practices`** - Clippy analysis for Rust
+- **`python_code_analyzer`** - Ruff analysis for Python
+
+### Formatting Tools
+
+- **`format_code`** - Prettier formatting for JS/TS/CSS/HTML/MD
+- **`rust_formatter`** - rustfmt for Rust code
+- **`python_formatter`** - Black formatting for Python
+
+### Security Tools
+
+- **`scan_security_vulnerabilities`** - Dependency vulnerability scanning
+- **`check_safety_rules`** - NASA JPL safety rules compliance
+- **`python_security_scanner`** - Bandit security analysis
+
+### Production Tools
+
+- **`check_production_readiness`** - Production deployment validation
+- **`check_accessibility`** - WCAG accessibility compliance
+- **`bundle_size_analyzer`** - Bundle size optimization
+
+## 📊 Example Workflows
+
+### 1. Code Review Workflow
+
+```bash
+# 1. Analyze code quality
+moidvk check-code -f src/
+
+# 2. Check security
+moidvk scan-security
+
+# 3. Verify accessibility
+moidvk check-accessibility -f src/components/
+
+# 4. Check production readiness
+moidvk check-production -f src/ --strict
+```
+
+### 2. Pre-Commit Workflow
+
+```bash
+# Format all code
+moidvk format -f src/
+
+# Run quality checks
+moidvk check-code -f src/ --production
+
+# Security scan
+moidvk scan-security --severity high
+
+# Performance check
+moidvk js-performance -f src/
+```
+
+### 3. CI/CD Integration
+
+```yaml
+# .github/workflows/moidvk.yml
+name: MOIDVK Analysis
+on: [push, pull_request]
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: oven-sh/setup-bun@v1
+
+      - name: Install MOIDVK
+        run: bun install -g @moikas/moidvk
+
+      - name: Code Quality Check
+        run: moidvk check-code -f src/ --production
+
+      - name: Security Scan
+        run: moidvk scan-security --severity medium
+
+      - name: Production Readiness
+        run: moidvk check-production -f src/ --strict
+```
+
+## 🧠 Intelligent Features
+
+### Semantic Code Search
+
+```bash
+# Search for authentication logic
+moidvk search-semantic --query "authentication logic" --path src/
+
+# Find similar code patterns
+moidvk search-semantic --query "error handling" --type similar_code
+```
+
+### Development Session Management
+
+```bash
+# Start a development session
+moidvk session start --project myapp
+
+# Resume previous session
+moidvk session resume --id session-123
+
+# Export session data
+moidvk session export --format json
+```
+
+### Intelligent Tool Routing
+
+```bash
+# Let MOIDVK choose the best tools for your project
+moidvk analyze --intelligent --path src/
+
+# Optimize tool sequence for performance
+moidvk analyze --optimize --goals "security,performance"
+```
+
+## 📈 Performance Tips
+
+### 1. Use Native Rust Components
+
+```bash
+# Ensure Rust components are built
+moidvk doctor --check-rust
+
+# Rebuild if needed
+bun run build:rust
+```
+
+### 2. Enable Caching
+
+```bash
+# Enable result caching
+export MOIDVK_CACHE_ENABLED=true
+export MOIDVK_CACHE_TTL=3600
+
+# Clear cache if needed
+moidvk cache clear
+```
+
+### 3. Parallel Processing
+
+```bash
+# Run multiple tools in parallel
+moidvk analyze --parallel --max-concurrent 5
+```
+
+## 🔍 Common Use Cases
+
+### Frontend Development
+
+```bash
+# React/Vue/Angular projects
+moidvk check-code -f src/ --framework react
+moidvk check-accessibility -f src/components/
+moidvk bundle-size -f dist/
+```
+
+### Backend Development
+
+```bash
+# Node.js/Express projects
+moidvk check-code -f src/ --production
+moidvk scan-security --include-dev false
+moidvk js-performance -f src/ --focus node
+```
+
+### Full-Stack Projects
+
+```bash
+# Comprehensive analysis
+moidvk analyze --all --path .
+moidvk check-production --strict
+moidvk scan-security --severity low
+```
+
+### Rust Projects
+
+```bash
+# Rust development workflow
+moidvk rust-practices -f src/
+moidvk rust-safety -f src/
+moidvk rust-performance -f src/
+moidvk rust-production -f src/
+```
+
+### Python Projects
+
+```bash
+# Python development workflow
+moidvk python-analyze -f src/
+moidvk python-security -f src/
+moidvk python-test -f tests/
+moidvk python-deps --check-outdated
+```
+
+## 🔧 Configuration
+
+### Basic Configuration
+
+Create `.moidvk.json` in your project root:
+
+```json
+{
+  "defaultLanguage": "javascript",
+  "strictMode": true,
+  "caching": {
+    "enabled": true,
+    "ttl": 3600
   },
   "tools": {
     "check_code_practices": {
       "production": true,
-      "strict": true
+      "severity": "warning"
+    },
+    "scan_security_vulnerabilities": {
+      "severity": "medium"
     }
   }
 }
 ```
 
-#### Batch Processing
+### Environment Variables
 
 ```bash
-# Check all JavaScript files
-find . -name "*.js" -exec moidvk check-code -f {} \;
+# Performance settings
+export MOIDVK_MAX_CONCURRENT=5
+export MOIDVK_TIMEOUT=30000
 
-# Format all files
-find . -name "*.js" | xargs -I {} moidvk format -f {} -o {}
+# Feature flags
+export MOIDVK_USE_RUST=true
+export MOIDVK_ENABLE_CACHE=true
+
+# Logging
+export MOIDVK_LOG_LEVEL=info
+export MOIDVK_LOG_FORMAT=json
 ```
-
-## 🎉 Congratulations!
-
-You've successfully:
-- ✅ Installed MOIDVK
-- ✅ Configured your MCP client
-- ✅ Run your first code analysis
-- ✅ Explored available tools
-- ✅ Learned to interpret results
-- ✅ Set up your development workflow
 
 ## 🆘 Getting Help
 
-### Self-Service Resources
+### Built-in Help
 
-- **Documentation**: [Main Documentation](README.md)
-- **Quick Start**: [Quick Start Guide](quick-start.md)
-- **Troubleshooting**: [Troubleshooting Guide](troubleshooting.md)
-- **Examples**: [Workflow Examples](workflow-examples.md)
+```bash
+# General help
+moidvk --help
+
+# Tool-specific help
+moidvk check-code --help
+
+# Diagnostic information
+moidvk doctor --verbose
+```
+
+### Documentation
+
+- **[Tool Reference](../technical/tool-reference.md)** - Complete tool documentation
+- **[Configuration Guide](../technical/configuration.md)** - Advanced configuration
+- **[Troubleshooting](troubleshooting.md)** - Common issues and solutions
 
 ### Community Support
 
-- **GitHub Issues**: [Repository Issues](https://github.com/your-org/moidvk/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-org/moidvk/discussions)
-- **Community**: Join the community forums
+- **[GitHub Issues](https://github.com/moikas-code/moidvk/issues)** - Bug reports and feature
+  requests
+- **[Discussions](https://github.com/moikas-code/moidvk/discussions)** - Community Q&A
+- **[Discord](https://discord.gg/moidvk)** - Real-time community support
 
-### Professional Support
+## 🎯 Next Steps
 
-- **Email**: support@moidvk.com
-- **Documentation**: [Documentation Site](https://docs.moidvk.com)
-- **Training**: Request training sessions for your team
+Now that you're set up with MOIDVK, explore these advanced features:
 
-## 📈 Tips for Success
-
-### Best Practices
-
-1. **Use MOIDVK Early**: Check code quality from the start
-2. **Automate**: Integrate tools into your workflow
-3. **Regular Scans**: Schedule security vulnerability scans
-4. **Team Adoption**: Share tools with your team
-5. **Continuous Learning**: Explore new tools and features
-
-### Pro Tips
-
-- **Golden Rule**: Always use MOIDVK tools before manual analysis
-- **Batch Processing**: Use CLI for processing multiple files
-- **Customization**: Configure tools for your specific needs
-- **Integration**: Connect with your existing tools and workflows
-- **Monitoring**: Track improvements over time
+1. **[CLI Usage Guide](cli-usage.md)** - Master the command-line interface
+2. **[Workflow Examples](workflow-examples.md)** - Real-world usage patterns
+3. **[Integration Guide](../technical/mcp-integration.md)** - Advanced MCP integration
+4. **[Performance Optimization](../technical/performance.md)** - Optimize for your workflow
 
 ---
 
-**Getting Started Complete!** 🎉 You're now ready to use MOIDVK effectively in your development workflow. Remember to explore the advanced features and integrate MOIDVK into your team's processes.
+**Ready to dive deeper?** Check out our
+[comprehensive tool reference](../technical/tool-reference.md) to explore all 37+ available tools!

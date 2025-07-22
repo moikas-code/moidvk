@@ -1,6 +1,6 @@
 {
   "name": "@moikas/moidvk",
-  "version": "1.0.0",
+  "version": "2.1.4",
   "description": "The Ultimate DevKit - MCP server for development best practices",
   "main": "server.js",
   "module": "server.js",
@@ -40,7 +40,12 @@
     "benchmark:quick": "node scripts/run-benchmarks.js --quick",
     "benchmark:vectors": "node scripts/run-benchmarks.js --vectors",
     "benchmark:files": "node scripts/run-benchmarks.js --files",
-    "benchmark:memory": "node scripts/run-benchmarks.js --memory"
+    "benchmark:memory": "node scripts/run-benchmarks.js --memory",
+    "version:patch": "npm version patch && git push && git push --tags",
+    "version:minor": "npm version minor && git push && git push --tags",
+    "version:major": "npm version major && git push && git push --tags",
+    "version:check": "node scripts/version-check.js",
+    "audit:complete": "bun cli.js audit-completion"
   },
   "keywords": [
     "mcp",

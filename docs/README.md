@@ -1,90 +1,88 @@
 # MOIDVK Documentation
 
-Welcome to the MOIDVK (Intelligent Development and Deployment Model Context Protocol) documentation.
+Welcome to the comprehensive documentation for MOIDVK - The Ultimate DevKit.
 
-## 📁 Documentation Structure
+## 📚 Documentation Structure
 
-### 📚 User Guide (`user-guide/`)
-Documentation for end users and developers using MOIDVK tools:
+### 🚀 Getting Started
 
-- **[Getting Started](user-guide/getting-started.md)** - Quick start guide and basic usage
-- **[Installation](user-guide/installation.md)** - Installation instructions and setup
-- **[Claude Code Setup](user-guide/claude-code-setup.md)** - Integration with Claude Code
-- **[CLI Usage](user-guide/cli-usage.md)** - Command-line interface documentation
-- **[Workflow Examples](user-guide/workflow-examples.md)** - Common development workflows
+- **[Installation Guide](user-guide/installation.md)** - Complete installation instructions
+- **[Quick Start](user-guide/getting-started.md)** - Get up and running in minutes
+- **[CLI Usage](user-guide/cli-usage.md)** - Command-line interface guide
 - **[Troubleshooting](user-guide/troubleshooting.md)** - Common issues and solutions
 
-### 🔧 Technical Documentation (`technical/`)
-In-depth technical specifications and implementation details:
+### 🛠️ User Guides
 
-- **[Security Model](technical/enhanced-security-model.md)** - Enhanced security architecture
-- **[Bash Implementation](technical/enhanced-bash-implementation.md)** - Secure command execution details
-- **[Security Overview](technical/security.md)** - Comprehensive security documentation
-- **[Tool Reference](technical/tool-reference.md)** - Complete tool API reference
-- **[Configuration](technical/configuration.md)** - Configuration options and settings
-- **[MCP Integration](technical/mcp-integration.md)** - Model Context Protocol integration
+- **[Workflow Examples](user-guide/workflow-examples.md)** - Real-world usage patterns
+- **[Claude Code Setup](user-guide/claude-code-setup.md)** - Integration with Claude Code
+- **[Best Practices](user-guide/best-practices.md)** - Recommended usage patterns
 
-### 🛠️ Development (`development/`)
-Documentation for developers working on MOIDVK:
+### 🔧 Technical Documentation
 
-- **[Local Testing Guide](development/local-testing-guide.md)** - Testing procedures and setup
-- **[Production Deployment](development/production-deployment.md)** - Production deployment guide
+- **[Tool Reference](technical/tool-reference.md)** - Complete tool documentation
+- **[MCP Integration](technical/mcp-integration.md)** - Model Context Protocol setup
+- **[Configuration](technical/configuration.md)** - Advanced configuration options
+- **[Security Model](technical/security.md)** - Security architecture and features
+- **[Rust Integration](technical/rust-integration.md)** - High-performance Rust core
+
+### 👨‍💻 Development
+
+- **[Contributing Guide](development/contributing.md)** - How to contribute
+- **[Development Setup](development/local-testing-guide.md)** - Local development environment
+- **[Architecture](development/architecture.md)** - System architecture overview
 - **[Changelog](development/changelog.md)** - Version history and changes
-- **[Embedding Upgrade Notes](development/embedding-upgrade-notes.md)** - AI embedding system updates
 
-### 📊 Reports (`reports/`)
-Audit reports, implementation status, and analysis documents:
+### 📊 Reports & Analysis
 
-- **[Implementation Complete Audit](reports/IMPLEMENTATION_COMPLETE_AUDIT.md)** - Full implementation status
-- **[Final Server Consolidation](reports/FINAL_SERVER_CONSOLIDATION.md)** - Server architecture summary
-- **[Rust Audit Report](reports/RUST_AUDIT_REPORT.md)** - Rust implementation audit
-- **[Comprehensive Audit Report](reports/COMPREHENSIVE_AUDIT_REPORT.md)** - Complete system audit
-- **[Server Consolidation Report](reports/SERVER_CONSOLIDATION_REPORT.md)** - Server architecture analysis
-- **[Rust Integration](reports/RUST_INTEGRATION.md)** - Rust language integration details
-- **[Rust Tools Summary](reports/RUST_TOOLS_SUMMARY.md)** - Rust tools implementation summary
-- **[Sandbox Audit Results](reports/sandbox-audit-results.md)** - Security sandbox analysis
+- **[Audit Reports](reports/)** - Security and quality audit results
+- **[Performance Benchmarks](reports/performance.md)** - Performance analysis
+- **[Tool Coverage](reports/tool-coverage.md)** - Feature coverage matrix
 
-## 🚀 Quick Start
+## 🎯 Quick Navigation
 
-1. **New Users**: Start with [Getting Started](user-guide/getting-started.md)
-2. **Installation**: Follow the [Installation Guide](user-guide/installation.md)
-3. **Claude Code Users**: See [Claude Code Setup](user-guide/claude-code-setup.md)
-4. **Developers**: Check [Local Testing Guide](development/local-testing-guide.md)
+### By Language
 
-## 🔍 Tool Categories
+- **[JavaScript/TypeScript Tools](technical/javascript-tools.md)**
+- **[Rust Tools](technical/rust-tools.md)**
+- **[Python Tools](technical/python-tools.md)**
 
-MOIDVK provides tools across multiple categories:
+### By Category
 
-- **Code Quality**: ESLint, Prettier, Safety Rules, Production Readiness
-- **Language Support**: JavaScript/TypeScript, Rust, Python
-- **Security**: Vulnerability scanning, dependency checks, security analysis
-- **Accessibility**: ADA compliance testing, WCAG validation
-- **GraphQL & APIs**: Schema validation, query optimization
-- **State Management**: Redux pattern analysis
-- **Filesystem**: Privacy-first file operations
-- **Development Intelligence**: AI-powered workflow optimization
+- **[Code Quality](technical/code-quality-tools.md)**
+- **[Security & Safety](technical/security-tools.md)**
+- **[Performance Analysis](technical/performance-tools.md)**
+- **[Accessibility](technical/accessibility-tools.md)**
 
-## 📈 Current Status
+### By Use Case
 
-- **Total Tools**: 47+ tools across all categories
-- **Language Support**: JavaScript/TypeScript, Rust, Python
-- **Implementation Status**: ✅ Complete and production-ready
-- **Documentation**: ✅ Comprehensive and organized
+- **[Production Deployment](user-guide/production-deployment.md)**
+- **[CI/CD Integration](user-guide/cicd-integration.md)**
+- **[Team Workflows](user-guide/team-workflows.md)**
 
-## 🆘 Need Help?
+## 🔍 Search & Discovery
 
-- **Common Issues**: Check [Troubleshooting](user-guide/troubleshooting.md)
-- **Configuration**: See [Configuration Guide](technical/configuration.md)
-- **Tool Usage**: Refer to [Tool Reference](technical/tool-reference.md)
-- **Examples**: Browse [Workflow Examples](user-guide/workflow-examples.md)
+Use the following patterns to find what you need:
 
-## 📝 Contributing
+- **Tool Names**: Search for specific tool names like `check_code_practices`
+- **Languages**: Search by language: `JavaScript`, `Rust`, `Python`
+- **Categories**: Search by category: `security`, `performance`, `accessibility`
+- **Error Codes**: Search for specific error codes or messages
 
-For developers working on MOIDVK:
-1. Review [Local Testing Guide](development/local-testing-guide.md)
-2. Check [Production Deployment](development/production-deployment.md)
-3. Follow security guidelines in [Security Model](technical/enhanced-security-model.md)
+## 📖 Documentation Standards
+
+All documentation follows these standards:
+
+- **Clear Examples**: Every feature includes working examples
+- **Version Information**: Compatibility and version requirements
+- **Error Handling**: Common errors and solutions
+- **Performance Notes**: Performance characteristics and optimization tips
+
+## 🤝 Contributing to Documentation
+
+Found an issue or want to improve the docs? See our
+[Documentation Contributing Guide](development/contributing.md#documentation).
 
 ---
 
-*Documentation organized and maintained for MOIDVK - The Ultimate DevKit*
+**Need help?** Check our [Troubleshooting Guide](user-guide/troubleshooting.md) or
+[open an issue](https://github.com/moikas-code/moidvk/issues).

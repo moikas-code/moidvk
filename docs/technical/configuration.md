@@ -1,203 +1,32 @@
 # Configuration Guide
 
-This comprehensive guide covers all configuration options for MOIDVK, including environment variables, configuration files, and advanced settings.
+MOIDVK provides extensive configuration options to customize its behavior for your specific
+development environment and requirements. This guide covers all configuration methods and options.
 
-## 🎯 Overview
+## 📋 Table of Contents
 
-MOIDVK provides flexible configuration options to adapt to different environments, security requirements, and use cases. This guide covers all configuration methods and options.
+- [Configuration Methods](#configuration-methods)
+- [Configuration File](#configuration-file)
+- [Environment Variables](#environment-variables)
+- [Command Line Options](#command-line-options)
+- [MCP Server Configuration](#mcp-server-configuration)
+- [Tool-Specific Configuration](#tool-specific-configuration)
+- [Performance Configuration](#performance-configuration)
+- [Security Configuration](#security-configuration)
+- [Integration Configuration](#integration-configuration)
+- [Advanced Configuration](#advanced-configuration)
 
-## 📋 Configuration Methods
+## 🔧 Configuration Methods
 
-### 1. Environment Variables
-Quick configuration for development and deployment
+MOIDVK supports multiple configuration methods with the following precedence (highest to lowest):
 
-### 2. Configuration Files
-Persistent configuration for projects and environments
+1. **Command line arguments** - Override all other settings
+2. **Environment variables** - Override file-based configuration
+3. **Project configuration file** - `.moidvk.json` in project root
+4. **Global configuration file** - `~/.moidvk/config.json`
+5. **Default values** - Built-in defaults
 
-### 3. Command Line Options
-Override settings for specific operations
-
-### 4. MCP Client Configuration
-Integration-specific settings
-
-## 🔧 Environment Variables
-
-### Core Environment Variables
-
-```bash
-# Basic Configuration
-NODE_ENV=production                    # Environment (development, production)
-DEBUG=false                           # Enable debug logging
-LOG_LEVEL=info                        # Log level (debug, info, warn, error)
-
-# Server Configuration
-PORT=3000                             # Server port
-HOST=0.0.0.0                          # Server host
-TIMEOUT=30000                         # Request timeout (ms)
-MAX_PAYLOAD=10mb                      # Maximum payload size
-
-# Security Configuration
-SECURITY_LEVEL=strict                 # Security level (permissive, balanced, strict)
-EXPLICIT_CONSENT=true                 # Require explicit consent
-ALLOWED_ORIGINS=https://your-domain.com # CORS origins (comma-separated)
-
-# Filesystem Configuration
-WORKSPACE_ROOT=/workspace             # Workspace root directory
-MAX_FILE_SIZE=10485760                # Maximum file size (bytes)
-EMBEDDING_CACHE_DIR=/cache/embeddings # Embedding cache directory
-MODEL_CACHE_DIR=/cache/models         # Model cache directory
-
-# Performance Configuration
-MAX_CONCURRENT_REQUESTS=10            # Maximum concurrent requests
-CACHE_ENABLED=true                    # Enable caching
-CACHE_TTL=3600                        # Cache TTL (seconds)
-
-# Monitoring Configuration
-ENABLE_METRICS=true                   # Enable metrics collection
-METRICS_PORT=9090                     # Metrics port
-HEALTH_CHECK_PATH=/health             # Health check endpoint
-```
-
-### Tool-Specific Environment Variables
-
-```bash
-# Code Quality Tools
-ESLINT_CONFIG_PATH=.eslintrc.json     # ESLint configuration path
-PRETTIER_CONFIG_PATH=.prettierrc      # Prettier configuration path
-PRODUCTION_MODE=false                 # Enable production mode for code checks
-
-# Security Tools
-NPM_REGISTRY=https://registry.npmjs.org/ # NPM registry URL
-AUDIT_SEVERITY=low                    # Minimum audit severity
-PRODUCTION_DEPS_ONLY=false            # Scan only production dependencies
-
-# Accessibility Tools
-PUPPETEER_EXECUTABLE_PATH=            # Custom Puppeteer executable path
-ACCESSIBILITY_TIMEOUT=30000           # Accessibility test timeout
-WCAG_STANDARD=AA                      # WCAG standard (A, AA, AAA)
-
-# GraphQL Tools
-GRAPHQL_MAX_DEPTH=7                   # Maximum query depth
-GRAPHQL_MAX_COMPLEXITY=100            # Maximum query complexity
-GRAPHQL_STRICT_MODE=false             # Enable strict GraphQL validation
-
-# Redux Tools
-REDUX_STRICT_MODE=false               # Enable strict Redux validation
-REDUX_TOOLKIT_DETECTION=true          # Enable Redux Toolkit detection
-
-# Filesystem Tools
-EMBEDDING_MODEL=all-MiniLM-L6-v2      # Embedding model name
-EMBEDDING_CACHE_SIZE=1GB              # Embedding cache size limit
-SNIPPET_MAX_SIZE=200                  # Maximum snippet size (lines)
-```
-
-### Environment-Specific Variables
-
-#### Development Environment
-```bash
-# Development settings
-NODE_ENV=development
-DEBUG=true
-LOG_LEVEL=debug
-SECURITY_LEVEL=permissive
-EXPLICIT_CONSENT=false
-CACHE_ENABLED=false
-```
-
-#### Production Environment
-```bash
-# Production settings
-NODE_ENV=production
-DEBUG=false
-LOG_LEVEL=warn
-SECURITY_LEVEL=strict
-EXPLICIT_CONSENT=true
-CACHE_ENABLED=true
-ENABLE_METRICS=true
-```
-
-#### Testing Environment
-```bash
-# Testing settings
-NODE_ENV=test
-DEBUG=true
-LOG_LEVEL=debug
-SECURITY_LEVEL=permissive
-EXPLICIT_CONSENT=false
-CACHE_ENABLED=false
-ENABLE_METRICS=false
-```
-
-## 📄 Configuration Files
-
-### Global Configuration
-
-Create `~/.moidvk/config.json`:
-
-```json
-{
-  "defaults": {
-    "security_level": "balanced",
-    "explicit_consent": true,
-    "max_file_size": 10485760,
-    "timeout": 30000
-  },
-  "tools": {
-    "check_code_practices": {
-      "production": false,
-      "strict": false,
-      "limit": 50,
-      "eslint_config": "~/.moidvk/.eslintrc.json"
-    },
-    "format_code": {
-      "check_only": false,
-      "prettier_config": "~/.moidvk/.prettierrc"
-    },
-    "scan_security_vulnerabilities": {
-      "severity": "low",
-      "production_only": false,
-      "registry": "https://registry.npmjs.org/"
-    },
-    "check_production_readiness": {
-      "strict": false,
-      "categories": ["todos", "console-logs", "debugging"]
-    },
-    "check_accessibility": {
-      "standard": "AA",
-      "timeout": 30000,
-      "include_contrast": true
-    },
-    "check_graphql_schema": {
-      "strict": false,
-      "max_issues": 50
-    },
-    "check_graphql_query": {
-      "max_depth": 7,
-      "max_complexity": 100
-    },
-    "check_redux_patterns": {
-      "strict": false,
-      "toolkit_detection": true
-    }
-  },
-  "filesystem": {
-    "workspace_root": "~/.moidvk/workspaces",
-    "allowed_extensions": [".js", ".ts", ".jsx", ".tsx", ".json", ".md"],
-    "blocked_patterns": ["**/node_modules/**", "**/.git/**", "**/*.env*"],
-    "embedding_cache": {
-      "enabled": true,
-      "max_size": "1GB",
-      "ttl": 86400
-    }
-  },
-  "monitoring": {
-    "enabled": true,
-    "metrics_port": 9090,
-    "health_check_path": "/health",
-    "audit_logging": true
-  }
-}
-```
+## 📄 Configuration File
 
 ### Project Configuration
 
@@ -205,516 +34,952 @@ Create `.moidvk.json` in your project root:
 
 ```json
 {
-  "project": {
-    "name": "my-project",
-    "version": "1.0.0",
-    "security_level": "strict",
-    "explicit_consent": true
+  "$schema": "https://raw.githubusercontent.com/moikas-code/moidvk/main/schemas/config.json",
+  "version": "1.0.0",
+  "extends": ["@moidvk/config-recommended"],
+
+  "general": {
+    "defaultSeverity": "warning",
+    "outputFormat": "detailed",
+    "maxConcurrent": 4,
+    "timeout": 30000,
+    "verbose": false
   },
+
+  "caching": {
+    "enabled": true,
+    "ttl": 3600,
+    "directory": ".moidvk-cache",
+    "maxSize": "100MB"
+  },
+
   "tools": {
     "check_code_practices": {
+      "enabled": true,
       "production": true,
-      "strict": true,
-      "eslint_config": ".eslintrc.json"
-    },
-    "format_code": {
-      "prettier_config": ".prettierrc"
+      "ruleCategory": "all",
+      "severity": "warning"
     },
     "scan_security_vulnerabilities": {
-      "severity": "moderate",
-      "production_only": true
+      "enabled": true,
+      "severity": "medium",
+      "production": false
     },
-    "check_production_readiness": {
-      "strict": true,
-      "categories": ["todos", "console-logs", "debugging", "documentation"]
+    "format_code": {
+      "enabled": true,
+      "check": false
     }
   },
-  "filesystem": {
-    "workspace_root": ".",
-    "allowed_extensions": [".js", ".ts", ".jsx", ".tsx", ".json", ".md", ".html"],
-    "blocked_patterns": [
-      "**/node_modules/**",
-      "**/.git/**",
-      "**/*.env*",
-      "**/dist/**",
-      "**/build/**"
-    ]
+
+  "ignore": ["node_modules/", "dist/", "build/", "*.min.js", "*.d.ts", "coverage/"],
+
+  "include": ["src/**/*.{js,ts,jsx,tsx}", "tests/**/*.{js,ts}", "*.{js,ts}"],
+
+  "languages": {
+    "javascript": {
+      "enabled": true,
+      "extensions": [".js", ".jsx", ".mjs"],
+      "parser": "babel"
+    },
+    "typescript": {
+      "enabled": true,
+      "extensions": [".ts", ".tsx"],
+      "parser": "typescript"
+    },
+    "python": {
+      "enabled": true,
+      "extensions": [".py"],
+      "version": "3"
+    },
+    "rust": {
+      "enabled": true,
+      "extensions": [".rs"],
+      "edition": "2021"
+    }
   },
-  "ignore": [
-    "node_modules/**",
-    "dist/**",
-    "build/**",
-    "*.min.js",
-    "coverage/**"
+
+  "integrations": {
+    "mcp": {
+      "enabled": true,
+      "port": 3000,
+      "host": "localhost"
+    },
+    "git": {
+      "enabled": true,
+      "hooks": ["pre-commit", "pre-push"]
+    },
+    "ci": {
+      "enabled": true,
+      "provider": "github-actions"
+    }
+  }
+}
+```
+
+### Global Configuration
+
+Create `~/.moidvk/config.json` for user-wide settings:
+
+```json
+{
+  "user": {
+    "name": "Your Name",
+    "email": "your.email@example.com",
+    "preferences": {
+      "colorOutput": true,
+      "progressBars": true,
+      "notifications": true
+    }
+  },
+
+  "defaults": {
+    "outputFormat": "detailed",
+    "severity": "warning",
+    "maxConcurrent": 4
+  },
+
+  "paths": {
+    "cacheDirectory": "~/.moidvk/cache",
+    "configDirectory": "~/.moidvk",
+    "logDirectory": "~/.moidvk/logs"
+  },
+
+  "telemetry": {
+    "enabled": false,
+    "anonymous": true
+  }
+}
+```
+
+### Configuration Schema
+
+MOIDVK provides JSON schema validation for configuration files:
+
+```bash
+# Validate configuration
+moidvk config validate
+
+# Generate schema
+moidvk config schema > moidvk-schema.json
+
+# Use in VS Code (add to settings.json)
+{
+  "json.schemas": [
+    {
+      "fileMatch": [".moidvk.json"],
+      "url": "./moidvk-schema.json"
+    }
   ]
 }
 ```
 
-### Environment-Specific Configuration
+## 🌍 Environment Variables
 
-#### Development Configuration
-Create `.moidvk.dev.json`:
-
-```json
-{
-  "environment": "development",
-  "debug": true,
-  "security_level": "permissive",
-  "explicit_consent": false,
-  "tools": {
-    "check_code_practices": {
-      "production": false,
-      "strict": false
-    }
-  },
-  "monitoring": {
-    "enabled": false
-  }
-}
-```
-
-#### Production Configuration
-Create `.moidvk.prod.json`:
-
-```json
-{
-  "environment": "production",
-  "debug": false,
-  "security_level": "strict",
-  "explicit_consent": true,
-  "tools": {
-    "check_code_practices": {
-      "production": true,
-      "strict": true
-    }
-  },
-  "monitoring": {
-    "enabled": true,
-    "audit_logging": true
-  }
-}
-```
-
-## 🔧 MCP Client Configuration
-
-### Claude Desktop Configuration
-
-```json
-{
-  "mcpServers": {
-    "moidvk": {
-      "command": "moidvk",
-      "args": ["serve"],
-      "env": {
-        "NODE_ENV": "development",
-        "DEBUG": "false",
-        "SECURITY_LEVEL": "balanced",
-        "EXPLICIT_CONSENT": "true"
-      },
-      "cwd": "/path/to/your/project"
-    }
-  }
-}
-```
-
-### Cursor Configuration
-
-```json
-{
-  "mcpServers": {
-    "moidvk": {
-      "command": "moidvk",
-      "args": ["serve", "--config", ".moidvk.json"],
-      "env": {
-        "NODE_ENV": "development",
-        "WORKSPACE_ROOT": "/path/to/your/project"
-      }
-    }
-  }
-}
-```
-
-### VS Code Configuration
-
-```json
-{
-  "mcp.servers": {
-    "moidvk": {
-      "command": "moidvk",
-      "args": ["serve"],
-      "env": {
-        "NODE_ENV": "development",
-        "DEBUG": "false"
-      }
-    }
-  },
-  "mcp.settings": {
-    "moidvk.security_level": "balanced",
-    "moidvk.explicit_consent": true
-  }
-}
-```
-
-## ⚙️ Advanced Configuration
-
-### Security Configuration
-
-#### Strict Security Mode
-```json
-{
-  "security": {
-    "level": "strict",
-    "explicit_consent": true,
-    "allowed_origins": ["https://your-domain.com"],
-    "rate_limit": {
-      "enabled": true,
-      "window_ms": 900000,
-      "max_requests": 100
-    },
-    "file_access": {
-      "max_size": 5242880,
-      "allowed_extensions": [".js", ".ts", ".json"],
-      "blocked_patterns": ["**/node_modules/**", "**/.git/**", "**/*.env*"]
-    },
-    "privacy": {
-      "local_processing": true,
-      "sensitive_data_detection": true,
-      "automatic_cleanup": true
-    }
-  }
-}
-```
-
-#### Permissive Security Mode
-```json
-{
-  "security": {
-    "level": "permissive",
-    "explicit_consent": false,
-    "allowed_origins": ["*"],
-    "rate_limit": {
-      "enabled": false
-    },
-    "file_access": {
-      "max_size": 52428800,
-      "allowed_extensions": ["*"],
-      "blocked_patterns": []
-    }
-  }
-}
-```
-
-### Performance Configuration
-
-#### High Performance Mode
-```json
-{
-  "performance": {
-    "max_concurrent_requests": 20,
-    "cache": {
-      "enabled": true,
-      "ttl": 7200,
-      "max_size": "2GB"
-    },
-    "embedding": {
-      "cache_enabled": true,
-      "cache_size": "2GB",
-      "model": "all-MiniLM-L6-v2"
-    },
-    "timeout": 60000
-  }
-}
-```
-
-#### Development Mode
-```json
-{
-  "performance": {
-    "max_concurrent_requests": 5,
-    "cache": {
-      "enabled": false
-    },
-    "embedding": {
-      "cache_enabled": false
-    },
-    "timeout": 30000
-  }
-}
-```
-
-### Tool-Specific Configuration
-
-#### ESLint Configuration
-```json
-{
-  "tools": {
-    "check_code_practices": {
-      "eslint_config": {
-        "extends": [
-          "eslint:recommended",
-          "@typescript-eslint/recommended"
-        ],
-        "rules": {
-          "no-console": "warn",
-          "prefer-const": "error",
-          "eqeqeq": "error"
-        },
-        "env": {
-          "browser": true,
-          "es2021": true
-        }
-      }
-    }
-  }
-}
-```
-
-#### Prettier Configuration
-```json
-{
-  "tools": {
-    "format_code": {
-      "prettier_config": {
-        "semi": true,
-        "trailingComma": "es5",
-        "singleQuote": true,
-        "printWidth": 80,
-        "tabWidth": 2
-      }
-    }
-  }
-}
-```
-
-#### Accessibility Configuration
-```json
-{
-  "tools": {
-    "check_accessibility": {
-      "standard": "AA",
-      "environment": "production",
-      "include_contrast": true,
-      "rule_set": "full",
-      "timeout": 30000,
-      "puppeteer_options": {
-        "headless": true,
-        "args": ["--no-sandbox", "--disable-setuid-sandbox"]
-      }
-    }
-  }
-}
-```
-
-## 🔍 Configuration Validation
-
-### Validate Configuration
+### Core Settings
 
 ```bash
-# Validate global configuration
-moidvk config --validate
+# General configuration
+export MOIDVK_CONFIG_PATH="/path/to/config.json"
+export MOIDVK_CACHE_DIR="/path/to/cache"
+export MOIDVK_LOG_LEVEL="info"  # debug, info, warn, error
+export MOIDVK_LOG_FORMAT="json"  # json, text, structured
 
-# Validate project configuration
-moidvk config --validate --config .moidvk.json
+# Performance settings
+export MOIDVK_MAX_CONCURRENT=5
+export MOIDVK_TIMEOUT=30000
+export MOIDVK_MEMORY_LIMIT="512MB"
 
-# Check configuration syntax
-moidvk config --check-syntax
+# Feature flags
+export MOIDVK_USE_RUST=true
+export MOIDVK_ENABLE_CACHE=true
+export MOIDVK_ENABLE_TELEMETRY=false
+export MOIDVK_ENABLE_NOTIFICATIONS=true
 
-# Test configuration
-moidvk config --test
+# Security settings
+export MOIDVK_SECURITY_LEVEL="DEVELOPMENT"  # STRICT, BALANCED, DEVELOPMENT, PERMISSIVE
+export MOIDVK_ENABLE_LEARNING=true
+export MOIDVK_KEEP_PRIVATE=true
+
+# MCP server settings
+export MOIDVK_MCP_PORT=3000
+export MOIDVK_MCP_HOST="localhost"
+export MOIDVK_MCP_ENABLED=true
+
+# Tool-specific settings
+export MOIDVK_JS_PARSER="babel"  # babel, typescript, espree
+export MOIDVK_PYTHON_VERSION="3"
+export MOIDVK_RUST_EDITION="2021"
 ```
+
+### Development Environment
+
+```bash
+# Development mode
+export NODE_ENV=development
+export MOIDVK_DEV_MODE=true
+export MOIDVK_DEBUG=true
+export MOIDVK_VERBOSE=true
+
+# Testing environment
+export MOIDVK_TEST_MODE=true
+export MOIDVK_MOCK_EXTERNAL=true
+export MOIDVK_DISABLE_CACHE=true
+```
+
+### CI/CD Environment
+
+```bash
+# CI/CD specific settings
+export CI=true
+export MOIDVK_CI_MODE=true
+export MOIDVK_NO_INTERACTIVE=true
+export MOIDVK_OUTPUT_FORMAT="json"
+export MOIDVK_EXIT_ON_ERROR=true
+
+# GitHub Actions
+export GITHUB_ACTIONS=true
+export MOIDVK_GITHUB_TOKEN="$GITHUB_TOKEN"
+
+# GitLab CI
+export GITLAB_CI=true
+export MOIDVK_GITLAB_TOKEN="$CI_JOB_TOKEN"
+```
+
+## ⚙️ Command Line Options
+
+### Global Options
+
+```bash
+# Configuration
+--config, -c <path>          # Configuration file path
+--no-config                  # Disable configuration file loading
+--config-override <json>     # Override specific config values
+
+# Output control
+--output, -o <file>          # Output file path
+--format <format>            # Output format (json, text, detailed, summary)
+--json                       # JSON output format
+--quiet, -q                  # Suppress non-essential output
+--verbose, -v                # Verbose output
+--no-color                   # Disable colored output
+--no-progress                # Disable progress bars
+
+# Performance
+--max-concurrent <num>       # Maximum concurrent operations
+--timeout <ms>               # Operation timeout in milliseconds
+--no-cache                   # Disable caching
+--cache-dir <path>           # Cache directory path
+
+# Debugging
+--debug                      # Enable debug mode
+--trace                      # Enable trace logging
+--profile                    # Enable performance profiling
+--dry-run                    # Show what would be done without executing
+```
+
+### Tool-Specific Options
+
+```bash
+# Code analysis
+--severity <level>           # Minimum severity (error, warning, info)
+--category <categories>      # Filter by categories
+--production                 # Enable production mode
+--strict                     # Enable strict mode
+
+# File handling
+--file, -f <path>           # Analyze specific file
+--directory, -d <path>      # Analyze directory
+--stdin                     # Read from stdin
+--include <pattern>         # Include file patterns
+--exclude <pattern>         # Exclude file patterns
+
+# Filtering and pagination
+--limit <num>               # Limit number of results
+--offset <num>              # Result offset for pagination
+--sort-by <field>           # Sort results by field
+--sort-order <order>        # Sort order (asc, desc)
+```
+
+## 🖥️ MCP Server Configuration
+
+### Server Settings
+
+```json
+{
+  "mcp": {
+    "server": {
+      "port": 3000,
+      "host": "localhost",
+      "protocol": "stdio",
+      "timeout": 30000,
+      "maxConnections": 10
+    },
+
+    "security": {
+      "enableAuth": false,
+      "apiKey": null,
+      "allowedOrigins": ["*"],
+      "rateLimiting": {
+        "enabled": true,
+        "maxRequests": 100,
+        "windowMs": 60000
+      }
+    },
+
+    "logging": {
+      "level": "info",
+      "format": "json",
+      "file": "mcp-server.log"
+    },
+
+    "tools": {
+      "enableAll": true,
+      "disabled": [],
+      "rateLimit": {
+        "perTool": 10,
+        "windowMs": 60000
+      }
+    }
+  }
+}
+```
+
+### Client Configuration
+
+For Claude Desktop (`~/.claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "moidvk": {
+      "command": "node",
+      "args": ["/path/to/moidvk/server.js"],
+      "env": {
+        "MOIDVK_CONFIG_PATH": "/path/to/.moidvk.json",
+        "MOIDVK_LOG_LEVEL": "info"
+      }
+    }
+  }
+}
+```
+
+For Continue (`~/.continue/config.json`):
+
+```json
+{
+  "mcpServers": [
+    {
+      "name": "moidvk",
+      "command": "node",
+      "args": ["/path/to/moidvk/server.js"],
+      "env": {
+        "MOIDVK_CONFIG_PATH": "/path/to/.moidvk.json"
+      }
+    }
+  ]
+}
+```
+
+## 🔧 Tool-Specific Configuration
+
+### JavaScript/TypeScript Tools
+
+```json
+{
+  "tools": {
+    "check_code_practices": {
+      "enabled": true,
+      "production": false,
+      "ruleCategory": "all",
+      "severity": "warning",
+      "limit": 50,
+      "sortBy": "line",
+      "customRules": {
+        "no-console": "error",
+        "no-debugger": "error"
+      }
+    },
+
+    "format_code": {
+      "enabled": true,
+      "check": false,
+      "prettier": {
+        "printWidth": 80,
+        "tabWidth": 2,
+        "useTabs": false,
+        "semi": true,
+        "singleQuote": true,
+        "trailingComma": "es5"
+      }
+    },
+
+    "js_performance_analyzer": {
+      "enabled": true,
+      "category": "all",
+      "focus": "general",
+      "includeMetrics": true,
+      "strictness": "standard"
+    }
+  }
+}
+```
+
+### Python Tools
+
+```json
+{
+  "tools": {
+    "python_code_analyzer": {
+      "enabled": true,
+      "pythonVersion": "3",
+      "select": ["E", "F", "W", "C90", "I", "N"],
+      "ignore": ["E501", "W503"],
+      "severity": "warning"
+    },
+
+    "python_formatter": {
+      "enabled": true,
+      "lineLength": 88,
+      "skipStringNormalization": false,
+      "skipMagicTrailingComma": false
+    },
+
+    "python_type_checker": {
+      "enabled": true,
+      "strict": false,
+      "checkUntyped": true,
+      "disallowUntyped": false,
+      "followImports": "skip"
+    }
+  }
+}
+```
+
+### Rust Tools
+
+```json
+{
+  "tools": {
+    "rust_code_practices": {
+      "enabled": true,
+      "edition": "2021",
+      "level": "warn",
+      "pedantic": false,
+      "category": "all"
+    },
+
+    "rust_formatter": {
+      "enabled": true,
+      "maxWidth": 100,
+      "tabSpaces": 4,
+      "indentStyle": "Block",
+      "useSmallHeuristics": "Default"
+    },
+
+    "rust_safety_checker": {
+      "enabled": true,
+      "strict": false
+    }
+  }
+}
+```
+
+## ⚡ Performance Configuration
+
+### Concurrency Settings
+
+```json
+{
+  "performance": {
+    "maxConcurrent": 4,
+    "queueSize": 100,
+    "timeout": 30000,
+    "retries": 3,
+    "backoff": {
+      "initial": 1000,
+      "multiplier": 2,
+      "maximum": 10000
+    }
+  },
+
+  "memory": {
+    "limit": "512MB",
+    "gcThreshold": "256MB",
+    "enableGC": true
+  },
+
+  "caching": {
+    "enabled": true,
+    "strategy": "lru",
+    "maxSize": "100MB",
+    "ttl": 3600,
+    "compression": true,
+    "persistence": true
+  }
+}
+```
+
+### Rust Native Bindings
+
+```json
+{
+  "rust": {
+    "enabled": true,
+    "fallbackToJS": true,
+    "binaryPath": null,
+    "features": {
+      "fileSearch": true,
+      "vectorOps": true,
+      "parallelProcessing": true
+    }
+  }
+}
+```
+
+### Resource Limits
+
+```json
+{
+  "limits": {
+    "maxFileSize": "10MB",
+    "maxFiles": 10000,
+    "maxDepth": 20,
+    "maxLineLength": 10000,
+    "timeout": {
+      "file": 5000,
+      "tool": 30000,
+      "total": 300000
+    }
+  }
+}
+```
+
+## 🔒 Security Configuration
+
+### Security Levels
+
+```json
+{
+  "security": {
+    "level": "DEVELOPMENT",
+    "features": {
+      "enableLearning": true,
+      "keepPrivate": true,
+      "sanitizeOutput": true,
+      "validateInputs": true
+    },
+
+    "commandExecution": {
+      "allowList": ["npm", "node", "git", "cargo", "python"],
+      "denyList": ["rm", "sudo", "chmod"],
+      "timeout": 60000,
+      "workingDirectory": ".",
+      "environment": "restricted"
+    },
+
+    "fileAccess": {
+      "allowedPaths": ["./src", "./tests", "./docs"],
+      "deniedPaths": ["/etc", "/usr", "/var"],
+      "maxFileSize": "10MB",
+      "allowSymlinks": false
+    }
+  }
+}
+```
+
+### Privacy Settings
+
+```json
+{
+  "privacy": {
+    "anonymizeData": true,
+    "excludePatterns": ["password", "token", "secret", "key", "api_key"],
+    "sanitizeFilenames": true,
+    "sanitizeContent": true,
+    "logLevel": "info"
+  }
+}
+```
+
+## 🔗 Integration Configuration
+
+### Git Integration
+
+```json
+{
+  "git": {
+    "enabled": true,
+    "hooks": {
+      "preCommit": {
+        "enabled": true,
+        "tools": ["format_code", "check_code_practices"],
+        "failOnError": true
+      },
+      "prePush": {
+        "enabled": true,
+        "tools": ["scan_security_vulnerabilities"],
+        "failOnError": true
+      }
+    },
+
+    "blame": {
+      "ignoreWhitespace": true,
+      "showEmail": false,
+      "maxLines": 1000
+    }
+  }
+}
+```
+
+### CI/CD Integration
+
+```json
+{
+  "ci": {
+    "enabled": true,
+    "provider": "github-actions",
+    "reportFormat": "json",
+    "artifactPath": "reports/",
+
+    "thresholds": {
+      "codeQuality": 85,
+      "security": 0,
+      "performance": 5
+    },
+
+    "notifications": {
+      "slack": {
+        "enabled": false,
+        "webhook": null,
+        "channel": "#dev"
+      },
+      "email": {
+        "enabled": false,
+        "recipients": []
+      }
+    }
+  }
+}
+```
+
+### IDE Integration
+
+```json
+{
+  "ide": {
+    "vscode": {
+      "enabled": true,
+      "extensions": ["moidvk.vscode-extension"],
+      "settings": {
+        "formatOnSave": true,
+        "lintOnSave": true,
+        "showInlineErrors": true
+      }
+    },
+
+    "languageServer": {
+      "enabled": true,
+      "port": 3001,
+      "features": {
+        "diagnostics": true,
+        "codeActions": true,
+        "formatting": true
+      }
+    }
+  }
+}
+```
+
+## 🚀 Advanced Configuration
+
+### Custom Tool Configuration
+
+```json
+{
+  "customTools": {
+    "myCustomTool": {
+      "command": "node",
+      "args": ["./tools/my-tool.js"],
+      "input": "file",
+      "output": "json",
+      "timeout": 10000,
+      "enabled": true
+    }
+  }
+}
+```
+
+### Plugin System
+
+```json
+{
+  "plugins": {
+    "enabled": true,
+    "directory": "./plugins",
+    "autoLoad": true,
+    "plugins": [
+      {
+        "name": "custom-linter",
+        "path": "./plugins/custom-linter.js",
+        "enabled": true,
+        "config": {
+          "rules": ["custom-rule-1", "custom-rule-2"]
+        }
+      }
+    ]
+  }
+}
+```
+
+### Workspace Configuration
+
+```json
+{
+  "workspace": {
+    "type": "monorepo",
+    "packages": [
+      {
+        "name": "frontend",
+        "path": "./packages/frontend",
+        "config": {
+          "tools": {
+            "check_accessibility": {
+              "enabled": true,
+              "standard": "AA"
+            }
+          }
+        }
+      },
+      {
+        "name": "backend",
+        "path": "./packages/backend",
+        "config": {
+          "tools": {
+            "openapi_rest_validator": {
+              "enabled": true,
+              "specPath": "./api.yaml"
+            }
+          }
+        }
+      }
+    ]
+  }
+}
+```
+
+### Environment-Specific Configuration
+
+```json
+{
+  "environments": {
+    "development": {
+      "extends": "base",
+      "tools": {
+        "check_code_practices": {
+          "severity": "warning"
+        }
+      },
+      "caching": {
+        "enabled": true
+      }
+    },
+
+    "production": {
+      "extends": "base",
+      "tools": {
+        "check_code_practices": {
+          "production": true,
+          "severity": "error"
+        },
+        "check_production_readiness": {
+          "enabled": true,
+          "strict": true
+        }
+      },
+      "caching": {
+        "enabled": false
+      }
+    },
+
+    "ci": {
+      "extends": "production",
+      "outputFormat": "json",
+      "verbose": false,
+      "maxConcurrent": 8
+    }
+  }
+}
+```
+
+## 📊 Configuration Management
 
 ### Configuration Commands
 
 ```bash
-# Show current configuration
-moidvk config --show
+# View current configuration
+moidvk config show
 
-# Show specific section
-moidvk config --show security
+# View effective configuration (with all overrides)
+moidvk config show --effective
 
-# Set configuration value
-moidvk config --set security.level strict
+# Validate configuration
+moidvk config validate
 
-# Get configuration value
-moidvk config --get security.level
+# Generate default configuration
+moidvk config init
+
+# Update configuration
+moidvk config set tools.check_code_practices.production true
+
+# Reset configuration
+moidvk config reset
 
 # Export configuration
-moidvk config --export > config-backup.json
+moidvk config export > my-config.json
 
 # Import configuration
-moidvk config --import config-backup.json
+moidvk config import my-config.json
 ```
 
-## 🔄 Configuration Management
+### Configuration Profiles
 
-### Environment-Specific Configuration
-
-#### Development Environment
 ```bash
-# Load development configuration
-export MOIDVK_CONFIG=.moidvk.dev.json
-moidvk serve
+# Create profile
+moidvk config profile create strict --from production
 
-# Or use environment variable
-NODE_ENV=development moidvk serve
-```
+# Use profile
+moidvk --profile strict check-code -d src/
 
-#### Production Environment
-```bash
-# Load production configuration
-export MOIDVK_CONFIG=.moidvk.prod.json
-moidvk serve
+# List profiles
+moidvk config profile list
 
-# Or use environment variable
-NODE_ENV=production moidvk serve
+# Delete profile
+moidvk config profile delete strict
 ```
 
 ### Configuration Inheritance
 
-Configuration follows this hierarchy (highest to lowest priority):
-
-1. **Command line options**
-2. **Environment variables**
-3. **Project configuration** (`.moidvk.json`)
-4. **Environment-specific configuration** (`.moidvk.{env}.json`)
-5. **Global configuration** (`~/.moidvk/config.json`)
-6. **Default configuration**
-
-### Configuration Templates
-
-#### Basic Template
 ```json
 {
-  "project": {
-    "name": "{{PROJECT_NAME}}",
-    "security_level": "balanced"
-  },
-  "tools": {
-    "check_code_practices": {
-      "production": false
-    }
+  "extends": ["@moidvk/config-base", "@moidvk/config-typescript", "./shared-config.json"],
+
+  "overrides": {
+    "tools.check_code_practices.production": true
   }
 }
 ```
 
-#### Advanced Template
-```json
-{
-  "project": {
-    "name": "{{PROJECT_NAME}}",
-    "version": "{{PROJECT_VERSION}}",
-    "security_level": "{{SECURITY_LEVEL}}"
-  },
-  "tools": {
-    "check_code_practices": {
-      "production": "{{PRODUCTION_MODE}}",
-      "strict": "{{STRICT_MODE}}"
-    }
-  },
-  "filesystem": {
-    "workspace_root": "{{WORKSPACE_ROOT}}"
-  }
-}
-```
+## 🔧 Troubleshooting Configuration
 
-## 🚨 Troubleshooting Configuration
+### Common Issues
 
-### Common Configuration Issues
-
-#### "Configuration file not found"
 ```bash
-# Check file path
-ls -la .moidvk.json
+# Debug configuration loading
+MOIDVK_DEBUG=true moidvk config show
 
-# Create default configuration
-moidvk config --init
+# Validate configuration syntax
+moidvk config validate --strict
 
-# Use absolute path
-moidvk serve --config /absolute/path/to/config.json
-```
+# Check configuration conflicts
+moidvk config check
 
-#### "Invalid configuration syntax"
-```bash
-# Validate JSON syntax
-cat .moidvk.json | jq .
+# Reset to defaults
+moidvk config reset --confirm
 
-# Check for syntax errors
-moidvk config --check-syntax
-
-# Use JSON validator
-python -m json.tool .moidvk.json
-```
-
-#### "Configuration not applied"
-```bash
-# Check configuration loading
-moidvk config --show
-
-# Check environment variables
-env | grep MOIDVK
-
-# Restart service after configuration change
-sudo systemctl restart moidvk
+# Clear cache
+moidvk cache clear
 ```
 
 ### Configuration Debugging
 
-```bash
-# Enable configuration debugging
-DEBUG=moidvk:config moidvk serve
-
-# Show configuration source
-moidvk config --show --verbose
-
-# Test configuration
-moidvk config --test --verbose
+```json
+{
+  "debug": {
+    "enabled": true,
+    "logConfig": true,
+    "logResolution": true,
+    "logOverrides": true,
+    "outputFile": "debug-config.log"
+  }
+}
 ```
 
-## 📚 Best Practices
+## 📚 Configuration Examples
 
-### Configuration Best Practices
+### Minimal Configuration
 
-1. **Use Environment Variables**: For sensitive data and deployment-specific settings
-2. **Use Configuration Files**: For project-specific settings
-3. **Validate Configuration**: Always validate before deployment
-4. **Version Control**: Include configuration files in version control
-5. **Documentation**: Document configuration options and their effects
-6. **Testing**: Test configuration in different environments
-7. **Backup**: Keep backups of important configurations
+```json
+{
+  "tools": {
+    "check_code_practices": { "enabled": true },
+    "format_code": { "enabled": true },
+    "scan_security_vulnerabilities": { "enabled": true }
+  }
+}
+```
 
-### Security Best Practices
+### Team Configuration
 
-1. **Environment Variables**: Store secrets in environment variables
-2. **File Permissions**: Set appropriate file permissions for configuration files
-3. **Validation**: Validate all configuration inputs
-4. **Principle of Least Privilege**: Use minimal required permissions
-5. **Audit**: Regularly audit configuration settings
+```json
+{
+  "extends": ["@moidvk/config-team"],
+  "team": {
+    "name": "Frontend Team",
+    "standards": {
+      "codeQuality": 85,
+      "security": "medium",
+      "accessibility": "AA"
+    }
+  },
+  "tools": {
+    "check_code_practices": {
+      "production": true,
+      "severity": "warning"
+    },
+    "check_accessibility": {
+      "standard": "AA",
+      "includeContrast": true
+    }
+  }
+}
+```
 
-### Performance Best Practices
+### Enterprise Configuration
 
-1. **Caching**: Enable caching for frequently accessed data
-2. **Resource Limits**: Set appropriate resource limits
-3. **Monitoring**: Enable monitoring for performance tracking
-4. **Optimization**: Optimize configuration for your use case
-5. **Testing**: Test performance with different configurations
+```json
+{
+  "extends": ["@moidvk/config-enterprise"],
+  "enterprise": {
+    "compliance": ["SOX", "GDPR", "HIPAA"],
+    "auditLogging": true,
+    "encryptionRequired": true
+  },
+  "security": {
+    "level": "STRICT",
+    "enableLearning": false,
+    "auditTrail": true
+  },
+  "tools": {
+    "license_compliance_scanner": {
+      "enabled": true,
+      "strictness": "enterprise"
+    },
+    "container_security_scanner": {
+      "enabled": true,
+      "includeCompliance": true
+    }
+  }
+}
+```
 
-## 📞 Configuration Support
+## 📚 Additional Resources
 
-### Getting Help
-
-1. **Documentation**: Check this guide and other documentation
-2. **Validation**: Use configuration validation tools
-3. **Examples**: Review configuration examples
-4. **Community**: Check community discussions
-5. **Support**: Contact support for complex issues
-
-### Configuration Examples
-
-- **Basic Setup**: [Basic Configuration Example](examples/basic-config.json)
-- **Production Setup**: [Production Configuration Example](examples/production-config.json)
-- **Development Setup**: [Development Configuration Example](examples/development-config.json)
-- **Security Setup**: [Security Configuration Example](examples/security-config.json)
+- **[CLI Usage Guide](../user-guide/cli-usage.md)** - Command line interface
+- **[Tool Reference](tool-reference.md)** - Complete tool documentation
+- **[Security Guide](security.md)** - Security features and best practices
+- **[Troubleshooting](../user-guide/troubleshooting.md)** - Common issues and solutions
 
 ---
 
-**Configuration Complete!** ⚙️ You now have comprehensive knowledge of MOIDVK configuration options. Use these settings to customize MOIDVK for your specific needs and environment.
+**Need help?** Use `moidvk config --help` for configuration assistance or check our documentation
+for more examples.

@@ -1,39 +1,58 @@
 # MCP Integration Guide
 
-This guide explains how to integrate MOIDVK with various Model Context Protocol (MCP) clients, including Claude Desktop, Cursor, VS Code, and Neovim.
+This guide covers how to integrate MOIDVK with Model Context Protocol (MCP) clients and build custom
+integrations.
 
-## 🎯 What is MCP?
+## 📋 Table of Contents
 
-The Model Context Protocol (MCP) is a standard that allows AI assistants to interact with external tools and data sources. MOIDVK implements this protocol to provide development tools directly within your AI-powered editor.
+- [MCP Overview](#mcp-overview)
+- [Client Configuration](#client-configuration)
+- [Tool Integration](#tool-integration)
+- [Custom Clients](#custom-clients)
+- [Advanced Features](#advanced-features)
+- [Troubleshooting](#troubleshooting)
 
-## 📋 Prerequisites
+## 🔍 MCP Overview
 
-Before integrating MOIDVK with your MCP client:
+### What is MCP?
 
-1. **Install MOIDVK** - Follow the [Installation Guide](installation.md)
-2. **Verify Installation** - Run `moidvk --help` to confirm it's working
-3. **Choose Your MCP Client** - Select from the supported clients below
+Model Context Protocol (MCP) is a standardized protocol for connecting AI assistants with external
+tools and data sources. MOIDVK implements MCP to provide seamless integration with various AI
+clients.
 
-## 🔧 Claude Desktop Integration
+### MOIDVK MCP Architecture
 
-Claude Desktop is the official desktop application for Claude AI, providing a native experience with MCP support.
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   MCP Client    │    │   MOIDVK Server  │    │   Tool Engine   │
+│  (Claude, etc.) │◄──►│   (MCP Bridge)   │◄──►│   (37+ Tools)   │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                       │                       │
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   User Input    │    │   Protocol       │    │   Results &     │
+│   & Commands    │    │   Translation    │    │   Responses     │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+```
 
-### Step 1: Install Claude Desktop
+### Key Features
 
-1. Download from [claude.ai/download](https://claude.ai/download)
-2. Install and launch the application
-3. Sign in with your Anthropic account
+- **37+ Tools**: Complete development toolkit via MCP
+- **Streaming Support**: Real-time results for large operations
+- **Error Handling**: Robust error reporting and recovery
+- **Authentication**: Secure tool access and validation
+- **Caching**: Intelligent result caching for performance
 
-### Step 2: Configure MCP Server
+## ⚙️ Client Configuration
 
-1. Open Claude Desktop
-2. Go to **Settings** (gear icon)
-3. Navigate to **MCP Servers**
-4. Click **Add Server**
+### Claude Desktop
 
-### Step 3: Server Configuration
+The most common MCP client integration.
 
-Add the following configuration:
+#### Basic Configuration
+
+Add to `~/.config/claude-desktop/config.json`:
 
 ```json
 {
@@ -41,462 +60,851 @@ Add the following configuration:
     "moidvk": {
       "command": "moidvk",
       "args": ["serve"],
-      "env": {
-        "NODE_ENV": "development"
-      }
+      "env": {}
     }
   }
 }
 ```
 
-### Step 4: Test Integration
-
-1. Restart Claude Desktop
-2. Start a new conversation
-3. Test with a simple command:
-
-```
-"Check this code for best practices:
-const x = 1
-if (x == '1') console.log('match')"
-```
-
-### Claude Desktop Features
-
-- **Native Integration**: Seamless tool usage within conversations
-- **Context Awareness**: Tools understand your current conversation
-- **Multi-tool Support**: Use multiple MOIDVK tools in sequence
-- **Error Handling**: Graceful error messages and suggestions
-
-## 🖥️ Cursor Integration
-
-Cursor is a modern AI-powered code editor with built-in MCP support.
-
-### Step 1: Install Cursor
-
-1. Download from [cursor.sh](https://cursor.sh/)
-2. Install and launch Cursor
-3. Sign in with your account
-
-### Step 2: Configure MCP Server
-
-1. Open Cursor
-2. Go to **Settings** (Cmd/Ctrl + ,)
-3. Navigate to **Extensions** → **MCP**
-4. Click **Add Server**
-
-### Step 3: Server Configuration
-
-Add the following configuration:
+#### Advanced Configuration
 
 ```json
 {
   "mcpServers": {
     "moidvk": {
       "command": "moidvk",
-      "args": ["serve"],
+      "args": ["serve", "--port", "3001", "--verbose"],
       "env": {
-        "NODE_ENV": "development"
-      }
+        "MOIDVK_LOG_LEVEL": "info",
+        "MOIDVK_CACHE_ENABLED": "true",
+        "MOIDVK_MAX_CONCURRENT": "5"
+      },
+      "timeout": 30000,
+      "retries": 3
     }
   }
 }
 ```
 
-### Step 4: Test Integration
-
-1. Restart Cursor
-2. Open a JavaScript file
-3. Use the command palette (Cmd/Ctrl + Shift + P)
-4. Type "MCP" to see available commands
-5. Test with a code quality check
-
-### Cursor-Specific Features
-
-- **File Context**: Tools automatically work with open files
-- **Inline Suggestions**: Get suggestions directly in your code
-- **Command Palette**: Quick access to MCP tools
-- **Multi-file Support**: Analyze entire projects
-
-## 🔧 VS Code Integration
-
-VS Code can be extended with MCP support through extensions.
-
-### Step 1: Install MCP Extension
-
-1. Open VS Code
-2. Go to Extensions (Ctrl+Shift+X)
-3. Search for "MCP" or "Model Context Protocol"
-4. Install the MCP extension
-
-### Step 2: Configure MCP Server
-
-1. Open VS Code settings (Ctrl+,)
-2. Search for "mcp"
-3. Add server configuration:
-
-```json
-{
-  "mcp.servers": {
-    "moidvk": {
-      "command": "moidvk",
-      "args": ["serve"],
-      "env": {
-        "NODE_ENV": "development"
-      }
-    }
-  }
-}
-```
-
-### Step 3: Test Integration
-
-1. Restart VS Code
-2. Open a JavaScript file
-3. Use the command palette (Ctrl+Shift+P)
-4. Type "MCP" to access tools
-
-## 🐍 Neovim Integration
-
-Neovim can be configured with MCP support through plugins.
-
-### Step 1: Install MCP Plugin
-
-Add to your `init.lua` or `init.vim`:
-
-```lua
--- Using lazy.nvim
-{
-  "mcp-plugins/mcp.nvim",
-  dependencies = {
-    "nvim-lua/plenary.nvim",
-  },
-  config = function()
-    require("mcp").setup({
-      servers = {
-        moidvk = {
-          command = "moidvk",
-          args = { "serve" },
-          env = {
-            NODE_ENV = "development"
-          }
-        }
-      }
-    })
-  end
-}
-```
-
-### Step 2: Configure Keybindings
-
-Add keybindings to your Neovim config:
-
-```lua
--- MCP tool keybindings
-vim.keymap.set("n", "<leader>mc", "<cmd>MCPCheckCode<cr>", { desc = "Check code quality" })
-vim.keymap.set("n", "<leader>mf", "<cmd>MCPFormatCode<cr>", { desc = "Format code" })
-vim.keymap.set("n", "<leader>ms", "<cmd>MCPScanSecurity<cr>", { desc = "Scan security" })
-```
-
-## 🔧 Advanced Configuration
-
-### Environment Variables
-
-Configure environment-specific settings:
-
-```json
-{
-  "mcpServers": {
-    "moidvk": {
-      "command": "moidvk",
-      "args": ["serve"],
-      "env": {
-        "NODE_ENV": "production",
-        "DEBUG": "false",
-        "LOG_LEVEL": "info",
-        "SECURITY_LEVEL": "strict",
-        "EXPLICIT_CONSENT": "true"
-      }
-    }
-  }
-}
-```
-
-### Multiple Server Instances
-
-Run multiple MOIDVK instances for different purposes:
+#### Multiple Instances
 
 ```json
 {
   "mcpServers": {
     "moidvk-dev": {
       "command": "moidvk",
-      "args": ["serve"],
+      "args": ["serve", "--port", "3001"],
       "env": {
-        "NODE_ENV": "development",
-        "DEBUG": "true"
+        "MOIDVK_ENV": "development"
       }
     },
     "moidvk-prod": {
       "command": "moidvk",
-      "args": ["serve"],
+      "args": ["serve", "--port", "3002"],
       "env": {
-        "NODE_ENV": "production",
-        "SECURITY_LEVEL": "strict"
+        "MOIDVK_ENV": "production",
+        "MOIDVK_STRICT_MODE": "true"
       }
     }
   }
 }
 ```
 
-### Custom Server Paths
+### VS Code MCP Extension
 
-If MOIDVK is not in your PATH:
+Configuration for VS Code with MCP support.
+
+#### Extension Settings
 
 ```json
 {
-  "mcpServers": {
+  "mcp.servers": [
+    {
+      "name": "moidvk",
+      "command": "moidvk serve",
+      "description": "MOIDVK - The Ultimate DevKit",
+      "enabled": true,
+      "autoStart": true
+    }
+  ],
+  "mcp.defaultTimeout": 30000,
+  "mcp.enableLogging": true
+}
+```
+
+#### Workspace Configuration
+
+```json
+{
+  "mcp.workspaceServers": {
     "moidvk": {
-      "command": "/full/path/to/moidvk",
-      "args": ["serve"]
+      "command": "moidvk",
+      "args": ["serve", "--cwd", "${workspaceFolder}"],
+      "env": {
+        "MOIDVK_PROJECT_ROOT": "${workspaceFolder}"
+      }
     }
   }
 }
 ```
 
-## 🧪 Testing Your Integration
+### Other MCP Clients
 
-### Basic Functionality Test
+#### Generic MCP Client
 
-Test that MOIDVK is working correctly:
-
-```
-"Test MOIDVK integration by checking this code:
-const x = 1
-if (x == '1') console.log('match')"
-```
-
-Expected response should include:
-- Tool usage confirmation
-- Code analysis results
-- Specific recommendations
-
-### Tool Availability Test
-
-Check which tools are available:
-
-```
-"What MOIDVK tools are available to you?"
+```json
+{
+  "servers": {
+    "moidvk": {
+      "command": "moidvk serve",
+      "transport": "stdio",
+      "capabilities": {
+        "tools": true,
+        "resources": true,
+        "prompts": false
+      }
+    }
+  }
+}
 ```
 
-You should see a list of available tools like:
-- `check_code_practices`
-- `format_code`
-- `check_safety_rules`
-- `scan_security_vulnerabilities`
-- `check_production_readiness`
-- `check_accessibility`
-- `check_graphql_schema`
-- `check_graphql_query`
-- `check_redux_patterns`
-- Filesystem tools
+#### Custom Client Configuration
 
-### Error Handling Test
+```javascript
+import { createMCPClient } from '@modelcontextprotocol/client';
 
-Test error handling with invalid input:
-
-```
-"Check this invalid code:
-function test() {
-  return
-}"
+const client = createMCPClient({
+  command: 'moidvk',
+  args: ['serve'],
+  transport: 'stdio',
+  timeout: 30000,
+  retries: 3,
+  env: {
+    MOIDVK_LOG_LEVEL: 'info',
+  },
+});
 ```
 
-## 🚨 Troubleshooting
+## 🛠️ Tool Integration
+
+### Available Tools
+
+MOIDVK exposes 37+ tools via MCP. Each tool follows the MCP tool specification.
+
+#### Tool Discovery
+
+```javascript
+// List all available tools
+const tools = await client.callTool('tools/list');
+console.log(tools);
+
+// Get tool schema
+const schema = await client.callTool('tools/get', {
+  name: 'check_code_practices',
+});
+```
+
+#### Tool Categories
+
+```javascript
+// Code quality tools
+const codeTools = ['check_code_practices', 'rust_code_practices', 'python_code_analyzer'];
+
+// Security tools
+const securityTools = [
+  'scan_security_vulnerabilities',
+  'check_safety_rules',
+  'python_security_scanner',
+];
+
+// Performance tools
+const performanceTools = [
+  'js_performance_analyzer',
+  'rust_performance_analyzer',
+  'bundle_size_analyzer',
+];
+```
+
+### Tool Usage Patterns
+
+#### Basic Tool Call
+
+```javascript
+const result = await client.callTool('check_code_practices', {
+  code: 'const x = 1; console.log(x);',
+  production: true,
+  severity: 'warning',
+});
+
+console.log(result.issues);
+```
+
+#### Batch Processing
+
+```javascript
+const files = ['app.js', 'utils.js', 'config.js'];
+const results = await Promise.all(
+  files.map((file) =>
+    client.callTool('check_code_practices', {
+      code: fs.readFileSync(file, 'utf8'),
+      filename: file,
+      production: true,
+    }),
+  ),
+);
+```
+
+#### Error Handling
+
+```javascript
+try {
+  const result = await client.callTool('check_code_practices', {
+    code: invalidCode,
+    production: true,
+  });
+} catch (error) {
+  if (error.code === 'TOOL_ERROR') {
+    console.error('Tool execution failed:', error.message);
+    console.log('Suggestions:', error.suggestions);
+  } else if (error.code === 'TIMEOUT') {
+    console.error('Tool execution timed out');
+  }
+}
+```
+
+#### Streaming Results
+
+```javascript
+const stream = client.streamTool('check_code_practices', {
+  code: largeCodebase,
+  production: true,
+});
+
+for await (const chunk of stream) {
+  console.log('Progress:', chunk.progress);
+  console.log('Partial results:', chunk.data);
+}
+```
+
+### Tool Chaining
+
+```javascript
+// Sequential tool execution
+async function analyzeCode(code, filename) {
+  // 1. Check code quality
+  const quality = await client.callTool('check_code_practices', {
+    code,
+    filename,
+    production: true,
+  });
+
+  // 2. Security scan if quality is good
+  if (quality.summary.errors === 0) {
+    const security = await client.callTool('python_security_scanner', {
+      code,
+      filename,
+    });
+
+    // 3. Performance analysis if secure
+    if (security.summary.high === 0) {
+      const performance = await client.callTool('js_performance_analyzer', {
+        code,
+        filename,
+        category: 'all',
+      });
+
+      return { quality, security, performance };
+    }
+  }
+
+  return { quality };
+}
+```
+
+## 🔧 Custom Clients
+
+### Building a Custom MCP Client
+
+#### Basic Client Implementation
+
+```javascript
+import { MCPClient } from '@modelcontextprotocol/client';
+import { spawn } from 'child_process';
+
+class MoidvkClient {
+  constructor(options = {}) {
+    this.options = {
+      command: 'moidvk',
+      args: ['serve'],
+      timeout: 30000,
+      ...options,
+    };
+    this.client = null;
+  }
+
+  async connect() {
+    const process = spawn(this.options.command, this.options.args, {
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+
+    this.client = new MCPClient({
+      transport: {
+        stdin: process.stdin,
+        stdout: process.stdout,
+        stderr: process.stderr,
+      },
+      timeout: this.options.timeout,
+    });
+
+    await this.client.connect();
+    return this;
+  }
+
+  async analyzeCode(code, options = {}) {
+    return await this.client.callTool('check_code_practices', {
+      code,
+      production: options.production || false,
+      severity: options.severity || 'warning',
+      ...options,
+    });
+  }
+
+  async formatCode(code, options = {}) {
+    return await this.client.callTool('format_code', {
+      code,
+      filename: options.filename,
+      ...options,
+    });
+  }
+
+  async scanSecurity(projectPath = '.') {
+    return await this.client.callTool('scan_security_vulnerabilities', {
+      projectPath,
+      severity: 'medium',
+    });
+  }
+
+  async disconnect() {
+    if (this.client) {
+      await this.client.disconnect();
+    }
+  }
+}
+
+// Usage
+const moidvk = new MoidvkClient();
+await moidvk.connect();
+
+const result = await moidvk.analyzeCode('const x = 1;', {
+  production: true,
+});
+
+await moidvk.disconnect();
+```
+
+#### Advanced Client with Caching
+
+```javascript
+class CachedMoidvkClient extends MoidvkClient {
+  constructor(options = {}) {
+    super(options);
+    this.cache = new Map();
+    this.cacheTTL = options.cacheTTL || 3600000; // 1 hour
+  }
+
+  _getCacheKey(tool, params) {
+    return `${tool}:${JSON.stringify(params)}`;
+  }
+
+  _isExpired(timestamp) {
+    return Date.now() - timestamp > this.cacheTTL;
+  }
+
+  async callTool(tool, params) {
+    const cacheKey = this._getCacheKey(tool, params);
+    const cached = this.cache.get(cacheKey);
+
+    if (cached && !this._isExpired(cached.timestamp)) {
+      return cached.result;
+    }
+
+    const result = await this.client.callTool(tool, params);
+
+    this.cache.set(cacheKey, {
+      result,
+      timestamp: Date.now(),
+    });
+
+    return result;
+  }
+
+  clearCache() {
+    this.cache.clear();
+  }
+}
+```
+
+#### Web-Based Client
+
+```javascript
+class WebMoidvkClient {
+  constructor(serverUrl = 'http://localhost:3000') {
+    this.serverUrl = serverUrl;
+  }
+
+  async callTool(tool, params) {
+    const response = await fetch(`${this.serverUrl}/mcp/tools/${tool}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(params),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    return await response.json();
+  }
+
+  async analyzeCode(code, options = {}) {
+    return await this.callTool('check_code_practices', {
+      code,
+      ...options,
+    });
+  }
+}
+
+// Usage in browser
+const client = new WebMoidvkClient();
+const result = await client.analyzeCode(editorContent);
+```
+
+### Integration Patterns
+
+#### React Hook
+
+```javascript
+import { useState, useEffect, useCallback } from 'react';
+
+function useMoidvk() {
+  const [client, setClient] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const initClient = async () => {
+      try {
+        const moidvk = new MoidvkClient();
+        await moidvk.connect();
+        setClient(moidvk);
+      } catch (err) {
+        setError(err);
+      }
+    };
+
+    initClient();
+
+    return () => {
+      if (client) {
+        client.disconnect();
+      }
+    };
+  }, []);
+
+  const analyzeCode = useCallback(
+    async (code, options) => {
+      if (!client) return null;
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        const result = await client.analyzeCode(code, options);
+        return result;
+      } catch (err) {
+        setError(err);
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [client],
+  );
+
+  return { analyzeCode, loading, error };
+}
+
+// Usage in component
+function CodeEditor() {
+  const { analyzeCode, loading, error } = useMoidvk();
+  const [code, setCode] = useState('');
+  const [analysis, setAnalysis] = useState(null);
+
+  const handleAnalyze = async () => {
+    const result = await analyzeCode(code, { production: true });
+    setAnalysis(result);
+  };
+
+  return (
+    <div>
+      <textarea value={code} onChange={(e) => setCode(e.target.value)} />
+      <button onClick={handleAnalyze} disabled={loading}>
+        {loading ? 'Analyzing...' : 'Analyze Code'}
+      </button>
+      {error && <div>Error: {error.message}</div>}
+      {analysis && <pre>{JSON.stringify(analysis, null, 2)}</pre>}
+    </div>
+  );
+}
+```
+
+#### CLI Wrapper
+
+```javascript
+#!/usr/bin/env node
+
+import { Command } from 'commander';
+import { MoidvkClient } from './moidvk-client.js';
+
+const program = new Command();
+
+program.name('moidvk-wrapper').description('Custom MOIDVK CLI wrapper').version('1.0.0');
+
+program
+  .command('analyze <file>')
+  .description('Analyze code file')
+  .option('-p, --production', 'Use production rules')
+  .option('-s, --severity <level>', 'Severity level', 'warning')
+  .action(async (file, options) => {
+    const client = new MoidvkClient();
+    await client.connect();
+
+    try {
+      const code = fs.readFileSync(file, 'utf8');
+      const result = await client.analyzeCode(code, {
+        filename: file,
+        production: options.production,
+        severity: options.severity,
+      });
+
+      console.log(JSON.stringify(result, null, 2));
+    } catch (error) {
+      console.error('Error:', error.message);
+      process.exit(1);
+    } finally {
+      await client.disconnect();
+    }
+  });
+
+program.parse();
+```
+
+## 🚀 Advanced Features
+
+### Intelligent Tool Routing
+
+```javascript
+class IntelligentMoidvkClient extends MoidvkClient {
+  async analyzeProject(projectPath, goals = []) {
+    // Use intelligent development analysis
+    const analysis = await this.client.callTool('intelligent_development_analysis', {
+      files: await this.getProjectFiles(projectPath),
+      development_goals: goals,
+      context: {
+        session_type: 'review',
+        scope: 'system',
+        urgency: 'medium',
+      },
+    });
+
+    // Execute recommended tool sequence
+    const results = {};
+    for (const step of analysis.recommended_sequence) {
+      results[step.tool] = await this.client.callTool(step.tool, {
+        projectPath,
+        ...step.params,
+      });
+    }
+
+    return results;
+  }
+}
+```
+
+### Session Management
+
+```javascript
+class SessionManagedClient extends MoidvkClient {
+  constructor(options = {}) {
+    super(options);
+    this.sessionId = null;
+  }
+
+  async startSession(projectContext) {
+    const session = await this.client.callTool('development_session_manager', {
+      action: 'start',
+      session_data: {
+        client_type: 'custom',
+        context: projectContext,
+        goals: [],
+      },
+    });
+
+    this.sessionId = session.id;
+    return session;
+  }
+
+  async checkpoint() {
+    if (!this.sessionId) return null;
+
+    return await this.client.callTool('development_session_manager', {
+      action: 'checkpoint',
+      session_data: { id: this.sessionId },
+    });
+  }
+
+  async resumeSession(sessionId) {
+    const session = await this.client.callTool('development_session_manager', {
+      action: 'resume',
+      session_data: { id: sessionId },
+    });
+
+    this.sessionId = sessionId;
+    return session;
+  }
+}
+```
+
+### Semantic Search Integration
+
+```javascript
+class SemanticMoidvkClient extends MoidvkClient {
+  async searchCode(query, options = {}) {
+    return await this.client.callTool('semantic_development_search', {
+      query,
+      search_type: options.type || 'similar_code',
+      max_results: options.maxResults || 10,
+      context_aware: options.contextAware !== false,
+      include_analysis: options.includeAnalysis !== false,
+    });
+  }
+
+  async findSimilarCode(codeSnippet) {
+    return await this.searchCode(codeSnippet, {
+      type: 'similar_code',
+      maxResults: 5,
+    });
+  }
+
+  async findBugs(description) {
+    return await this.searchCode(description, {
+      type: 'bug_hunt',
+      maxResults: 10,
+    });
+  }
+
+  async findOptimizationTargets(performanceGoal) {
+    return await this.searchCode(performanceGoal, {
+      type: 'optimization_targets',
+      maxResults: 8,
+    });
+  }
+}
+```
+
+## 🔧 Configuration & Customization
+
+### Server Configuration
+
+```javascript
+// Custom server configuration
+const serverConfig = {
+  port: 3001,
+  host: 'localhost',
+  timeout: 60000,
+  maxConcurrent: 5,
+  caching: {
+    enabled: true,
+    ttl: 3600,
+    maxSize: 1000,
+  },
+  security: {
+    enableAuth: false,
+    allowedOrigins: ['*'],
+    rateLimit: {
+      windowMs: 60000,
+      max: 100,
+    },
+  },
+  logging: {
+    level: 'info',
+    format: 'json',
+    file: '/var/log/moidvk.log',
+  },
+};
+
+// Start server with custom config
+const server = new MoidvkServer(serverConfig);
+await server.start();
+```
+
+### Tool Configuration
+
+```javascript
+// Configure specific tools
+const toolConfig = {
+  check_code_practices: {
+    defaultProduction: true,
+    defaultSeverity: 'warning',
+    ruleOverrides: {
+      'no-console': 'off',
+      'prefer-const': 'error',
+    },
+  },
+  scan_security_vulnerabilities: {
+    defaultSeverity: 'medium',
+    excludeDevDependencies: true,
+    customAuditCommand: 'bun audit',
+  },
+  format_code: {
+    defaultConfig: {
+      semi: true,
+      singleQuote: true,
+      tabWidth: 2,
+    },
+  },
+};
+
+const client = new MoidvkClient({ toolConfig });
+```
+
+## 🐛 Troubleshooting
 
 ### Common Integration Issues
 
-#### "Server connection failed"
+#### Connection Failures
 
-**Symptoms**: MCP client can't connect to MOIDVK
-
-**Solutions**:
-```bash
-# Check if server is running
-moidvk serve
-
-# Verify command path
-which moidvk
-
-# Check permissions
-ls -la $(which moidvk)
-```
-
-#### "Command not found"
-
-**Symptoms**: MCP client reports command not found
-
-**Solutions**:
-```bash
-# Reinstall globally
-bun install -g moidvk
-
-# Check PATH
-echo $PATH
-
-# Test command directly
-moidvk --help
-```
-
-#### "Permission denied"
-
-**Symptoms**: Permission errors when starting server
-
-**Solutions**:
-```bash
-# Fix permissions
-chmod +x $(which moidvk)
-
-# Check ownership
-ls -la $(which moidvk)
-```
-
-#### "Tool not available"
-
-**Symptoms**: Specific tools not showing up
-
-**Solutions**:
-```bash
-# Check server logs
-moidvk serve --verbose
-
-# Verify tool registration
-moidvk --help
-```
-
-### Client-Specific Issues
-
-#### Claude Desktop Issues
-
-- **Restart Required**: Always restart after configuration changes
-- **Configuration Location**: Check `~/Library/Application Support/Claude/` (macOS) or `%APPDATA%\Claude\` (Windows)
-- **Logs**: Check console logs for detailed error messages
-
-#### Cursor Issues
-
-- **Extension Conflicts**: Disable conflicting extensions
-- **Workspace Settings**: Check `.vscode/settings.json` for conflicts
-- **Command Palette**: Use Cmd/Ctrl + Shift + P to access MCP commands
-
-#### VS Code Issues
-
-- **Extension Version**: Ensure MCP extension is up to date
-- **Settings Conflicts**: Check for conflicting settings
-- **Workspace Trust**: Ensure workspace is trusted
-
-#### Neovim Issues
-
-- **Plugin Dependencies**: Ensure all dependencies are installed
-- **Lua Version**: Check Lua version compatibility
-- **Keybindings**: Verify keybindings are not conflicting
-
-### Debug Mode
-
-Enable debug mode for detailed troubleshooting:
-
-```json
-{
-  "mcpServers": {
-    "moidvk": {
-      "command": "moidvk",
-      "args": ["serve", "--debug"],
-      "env": {
-        "DEBUG": "true",
-        "LOG_LEVEL": "debug"
+```javascript
+// Add connection retry logic
+class RobustMoidvkClient extends MoidvkClient {
+  async connect(retries = 3) {
+    for (let i = 0; i < retries; i++) {
+      try {
+        await super.connect();
+        return this;
+      } catch (error) {
+        if (i === retries - 1) throw error;
+        await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
       }
     }
   }
 }
 ```
 
-### Log Analysis
+#### Timeout Handling
 
-Check logs for specific error messages:
-
-```bash
-# Run server with verbose logging
-moidvk serve --verbose
-
-# Check system logs
-journalctl -u moidvk  # Linux
-log show --predicate 'process == "moidvk"'  # macOS
+```javascript
+// Implement timeout handling
+async function callToolWithTimeout(client, tool, params, timeout = 30000) {
+  return Promise.race([
+    client.callTool(tool, params),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Tool execution timeout')), timeout),
+    ),
+  ]);
+}
 ```
 
-## 🔄 Updating Integration
+#### Error Recovery
 
-### Updating MOIDVK
+```javascript
+// Implement error recovery
+class RecoveringMoidvkClient extends MoidvkClient {
+  async callTool(tool, params, retries = 2) {
+    for (let i = 0; i <= retries; i++) {
+      try {
+        return await super.callTool(tool, params);
+      } catch (error) {
+        if (i === retries) throw error;
 
-```bash
-# Update from source
-cd /path/to/moidvk
-git pull
-bun install
-bun link
+        // Attempt recovery based on error type
+        if (error.code === 'CONNECTION_LOST') {
+          await this.reconnect();
+        } else if (error.code === 'TOOL_UNAVAILABLE') {
+          await this.waitForTool(tool);
+        }
+      }
+    }
+  }
 
-# Or update global installation
-bun install -g moidvk@latest
+  async reconnect() {
+    await this.disconnect();
+    await this.connect();
+  }
+
+  async waitForTool(tool, timeout = 5000) {
+    const start = Date.now();
+    while (Date.now() - start < timeout) {
+      try {
+        await this.client.callTool('tools/get', { name: tool });
+        return;
+      } catch {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+    }
+    throw new Error(`Tool ${tool} not available after ${timeout}ms`);
+  }
+}
 ```
 
-### Updating MCP Client
+### Debugging MCP Communication
 
-- **Claude Desktop**: Updates automatically
-- **Cursor**: Updates automatically
-- **VS Code**: Update MCP extension
-- **Neovim**: Update MCP plugin
+```javascript
+// Enable MCP protocol debugging
+class DebuggingMoidvkClient extends MoidvkClient {
+  constructor(options = {}) {
+    super(options);
+    this.debug = options.debug || false;
+  }
 
-### Configuration Migration
+  async callTool(tool, params) {
+    if (this.debug) {
+      console.log(`[MCP] Calling tool: ${tool}`);
+      console.log(`[MCP] Parameters:`, JSON.stringify(params, null, 2));
+    }
 
-When updating, check for configuration changes:
+    const start = Date.now();
+    try {
+      const result = await super.callTool(tool, params);
 
-1. **Backup Configuration**: Save current MCP settings
-2. **Check Changelog**: Review [changelog.md](changelog.md)
-3. **Update Configuration**: Apply any new required settings
-4. **Test Integration**: Verify everything still works
+      if (this.debug) {
+        console.log(`[MCP] Tool completed in ${Date.now() - start}ms`);
+        console.log(`[MCP] Result:`, JSON.stringify(result, null, 2));
+      }
 
-## 📚 Best Practices
+      return result;
+    } catch (error) {
+      if (this.debug) {
+        console.error(`[MCP] Tool failed after ${Date.now() - start}ms`);
+        console.error(`[MCP] Error:`, error);
+      }
+      throw error;
+    }
+  }
+}
+```
 
-### Security Considerations
+## 📚 Additional Resources
 
-- **Explicit Consent**: Enable explicit consent for sensitive operations
-- **Path Restrictions**: Configure workspace boundaries
-- **Logging**: Monitor logs for unusual activity
-- **Updates**: Keep MOIDVK and clients updated
-
-### Performance Optimization
-
-- **Resource Limits**: Set appropriate file size and timeout limits
-- **Caching**: Enable embedding caching for better performance
-- **Background Processing**: Use background mode for long-running operations
-
-### Workflow Integration
-
-- **Pre-commit Hooks**: Integrate MOIDVK into your Git workflow
-- **CI/CD Pipeline**: Add MOIDVK checks to your build process
-- **Code Reviews**: Use MOIDVK tools during code reviews
-
-## 🆘 Getting Help
-
-If you encounter issues with MCP integration:
-
-1. **Check this troubleshooting section**
-2. **Review the [Troubleshooting Guide](troubleshooting.md)**
-3. **Search existing issues** in the GitHub repository
-4. **Create a new issue** with detailed information:
-   - MCP client and version
-   - MOIDVK version
-   - Error messages and logs
-   - Steps to reproduce
+- **[Tool Reference](tool-reference.md)** - Complete tool documentation
+- **[Configuration Guide](configuration.md)** - Advanced configuration options
+- **[CLI Usage](../user-guide/cli-usage.md)** - Command-line interface
+- **[MCP Specification](https://modelcontextprotocol.io/)** - Official MCP documentation
 
 ---
 
-**Integration Complete!** 🎉 Your MCP client is now connected to MOIDVK. Proceed to the [Tool Reference](tool-reference.md) to learn about all available tools.
+**Need help with MCP integration?** Check our
+[troubleshooting guide](../user-guide/troubleshooting.md) or
+[open an issue](https://github.com/moikas-code/moidvk/issues).

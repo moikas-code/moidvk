@@ -1,772 +1,716 @@
 # CLI Usage Guide
 
-The MOIDVK command-line interface provides direct access to all tools and features without requiring an MCP client. This guide covers all CLI commands, options, and usage patterns.
+MOIDVK provides a comprehensive command-line interface for standalone usage and integration into
+development workflows. This guide covers all CLI commands and usage patterns.
 
-## 🎯 Overview
+## 📋 Table of Contents
 
-The MOIDVK CLI offers:
-- **Direct tool access** - Use tools without MCP client
-- **Batch processing** - Process multiple files efficiently
-- **Pipeline integration** - Integrate with CI/CD workflows
-- **Scripting support** - Automate development tasks
-- **JSON output** - Machine-readable results
-
-## 📋 Installation
-
-### Global Installation
-
-```bash
-# Install globally with Bun
-bun install -g moidvk
-
-# Install globally with npm
-npm install -g moidvk
-
-# Verify installation
-moidvk --version
-```
-
-### Local Installation
-
-```bash
-# Clone repository
-git clone https://github.com/your-org/moidvk.git
-cd moidvk
-
-# Install dependencies
-bun install
-
-# Create global link
-bun link
-
-# Verify installation
-moidvk --help
-```
+- [Basic Commands](#basic-commands)
+- [Code Analysis Commands](#code-analysis-commands)
+- [Formatting Commands](#formatting-commands)
+- [Security Commands](#security-commands)
+- [Performance Commands](#performance-commands)
+- [Production Commands](#production-commands)
+- [Utility Commands](#utility-commands)
+- [Global Options](#global-options)
+- [Configuration](#configuration)
+- [Examples & Workflows](#examples--workflows)
 
 ## 🚀 Basic Commands
 
-### Server Commands
-
-#### Start MCP Server
+### Server Management
 
 ```bash
-# Start the MCP server
+# Start MCP server
 moidvk serve
-
-# Start with debug mode
-moidvk serve --debug
 
 # Start with custom port
 moidvk serve --port 3001
 
-# Start with specific environment
-moidvk serve --env production
+# Start with verbose logging
+moidvk serve --verbose
+
+# Test server functionality
+moidvk serve --test
+
+# Start in development mode
+moidvk serve --dev
 ```
 
-**Options:**
-- `--debug` - Enable debug logging
-- `--port <number>` - Specify port (default: 3000)
-- `--env <environment>` - Set environment (development/production)
-- `--config <path>` - Use custom configuration file
-
-#### Server Status
+### System Information
 
 ```bash
-# Check server status
-moidvk status
+# Show version
+moidvk --version
+moidvk -v
 
-# Get server information
-moidvk info
+# Show help
+moidvk --help
+moidvk -h
+
+# Show help for specific command
+moidvk check-code --help
+
+# System diagnostics
+moidvk doctor
+moidvk doctor --verbose
 ```
 
-### Code Quality Commands
+## 🔍 Code Analysis Commands
 
-#### Check Code Practices
-
-```bash
-# Check code from stdin
-echo "const x = 1" | moidvk check-code
-
-# Check specific file
-moidvk check-code -f src/index.js
-
-# Check with production rules
-moidvk check-code -f src/server.js --production
-
-# Check with strict mode
-moidvk check-code -f src/critical.js --strict
-
-# Output JSON format
-moidvk check-code -f src/app.js --format json
-```
-
-**Options:**
-- `-f, --file <path>` - Input file path
-- `--production` - Enable production mode (stricter rules)
-- `--strict` - Enable strict mode
-- `--format <format>` - Output format (text, json, detailed)
-- `--limit <number>` - Maximum issues to report (default: 50)
-- `--offset <number>` - Starting index for pagination (default: 0)
-
-#### Format Code
+### JavaScript/TypeScript Analysis
 
 ```bash
-# Format code from stdin
-echo "const x=1;const y=2;" | moidvk format
+# Analyze single file
+moidvk check-code -f src/app.js
 
-# Format specific file
-moidvk format -f src/messy.js
-
-# Format and save to new file
-moidvk format -f src/messy.js -o src/clean.js
-
-# Check if formatting is needed
-moidvk format -f src/app.js --check
-
-# Format with specific parser
-moidvk format -f src/component.tsx --parser typescript
-```
-
-**Options:**
-- `-f, --file <path>` - Input file path
-- `-o, --output <path>` - Output file path
-- `--check` - Check if formatting is needed
-- `--parser <parser>` - Specify parser (auto-detected by default)
-
-### Safety and Security Commands
-
-#### Check Safety Rules
-
-```bash
-# Check safety rules
-moidvk check-safety -f src/critical-system.js
-
-# Check with detailed output
-moidvk check-safety -f src/rocket-control.js --format detailed
-
-# Check with custom safety level
-moidvk check-safety -f src/medical-device.js --level strict
-```
-
-**Options:**
-- `-f, --file <path>` - Input file path
-- `--level <level>` - Safety level (standard, strict, critical)
-- `--format <format>` - Output format (text, json, detailed)
-
-#### Scan Security Vulnerabilities
-
-```bash
-# Scan current directory
-moidvk scan-security
-
-# Scan specific project
-moidvk scan-security -p /path/to/project
-
-# Scan production dependencies only
-moidvk scan-security --production
-
-# Scan with specific severity
-moidvk scan-security --severity high
-
-# Get detailed vulnerability report
-moidvk scan-security --format detailed
-
-# Limit results
-moidvk scan-security --limit 20
-```
-
-**Options:**
-- `-p, --path <path>` - Project path (default: current directory)
-- `--production` - Scan only production dependencies
-- `--severity <level>` - Minimum severity (low, moderate, high, critical)
-- `--format <format>` - Output format (summary, detailed)
-- `--limit <number>` - Maximum vulnerabilities to report
-- `--offset <number>` - Starting index for pagination
-
-### Production Readiness Commands
-
-#### Check Production Readiness
-
-```bash
-# Check production readiness
-moidvk check-production -f src/server.js
-
-# Check with strict mode
-moidvk check-production -f src/api.js --strict
-
-# Check with custom categories
-moidvk check-production -f src/app.js --categories todos,console-logs
-
-# Get detailed checklist
-moidvk check-production -f src/critical.js --format detailed
-```
-
-**Options:**
-- `-f, --file <path>` - Input file path
-- `--strict` - Enable strict mode
-- `--categories <list>` - Specific categories to check
-- `--format <format>` - Output format (text, json, detailed)
-
-### Accessibility Commands
-
-#### Check Accessibility
-
-```bash
-# Check HTML file
-moidvk check-accessibility -f index.html
-
-# Check React component
-moidvk check-accessibility -f Component.jsx
-
-# Check with specific standard
-moidvk check-accessibility -f page.html --standard AAA
-
-# Check with minimal rules
-moidvk check-accessibility -f form.html --rule-set minimal
-
-# Check without contrast validation
-moidvk check-accessibility -f app.html --no-contrast
-```
-
-**Options:**
-- `-f, --file <path>` - Input file path
-- `--standard <level>` - WCAG standard (A, AA, AAA)
-- `--rule-set <set>` - Rule set (minimal, forms, content, navigation, full)
-- `--no-contrast` - Skip color contrast checking
-- `--environment <env>` - Environment (development, production)
-
-### GraphQL Commands
-
-#### Check GraphQL Schema
-
-```bash
-# Check schema file
-moidvk check-graphql-schema -f schema.graphql
-
-# Check with strict mode
-moidvk check-graphql-schema -f schema.graphql --strict
-
-# Check with custom limits
-moidvk check-graphql-schema -f schema.graphql --limit 30
-
-# Check specific categories
-moidvk check-graphql-schema -f schema.graphql --categories security,design
-```
-
-**Options:**
-- `-f, --file <path>` - Input file path
-- `--strict` - Enable strict mode
-- `--limit <number>` - Maximum issues to report
-- `--categories <list>` - Specific categories to check
-
-#### Check GraphQL Query
-
-```bash
-# Check query file
-moidvk check-graphql-query -f query.graphql
-
-# Check with custom depth limit
-moidvk check-graphql-query -f query.graphql --max-depth 3
-
-# Check with complexity limit
-moidvk check-graphql-query -f query.graphql --max-complexity 50
-
-# Check with schema validation
-moidvk check-graphql-query -f query.graphql --schema schema.graphql
-```
-
-**Options:**
-- `-f, --file <path>` - Input file path
-- `--max-depth <number>` - Maximum query depth (default: 7)
-- `--max-complexity <number>` - Maximum complexity (default: 100)
-- `--schema <path>` - Schema file for validation
-
-### Redux Commands
-
-#### Check Redux Patterns
-
-```bash
-# Check Redux file
-moidvk check-redux -f store.js
-
-# Check with strict mode
-moidvk check-redux -f reducer.js --strict
-
-# Check specific code type
-moidvk check-redux -f slice.js --code-type slice
-
-# Check with custom limits
-moidvk check-redux -f store.js --limit 25
-```
-
-**Options:**
-- `-f, --file <path>` - Input file path
-- `--strict` - Enable strict mode
-- `--code-type <type>` - Code type (auto, reducer, action, store, selector, middleware, component)
-- `--limit <number>` - Maximum issues to report
-
-## 🔄 Advanced Usage
-
-### Batch Processing
-
-#### Process Multiple Files
-
-```bash
-# Check all JavaScript files
-find . -name "*.js" -exec moidvk check-code -f {} \;
-
-# Format all TypeScript files
-for file in src/**/*.ts; do
-  moidvk format -f "$file" -o "$file"
-done
-
-# Check all files in parallel
-find . -name "*.js" | xargs -P 4 -I {} moidvk check-code -f {}
-```
-
-#### Directory Processing
-
-```bash
-# Check entire directory
+# Analyze directory
 moidvk check-code -d src/
 
-# Format entire directory
-moidvk format -d src/ -o formatted/
+# Analyze with production rules
+moidvk check-code -f src/app.js --production
 
-# Scan security for multiple projects
-for project in projects/*; do
-  echo "Scanning $project..."
-  moidvk scan-security -p "$project"
-done
+# Filter by severity
+moidvk check-code -f src/app.js --severity error
+
+# Limit results
+moidvk check-code -f src/app.js --limit 10
+
+# Output as JSON
+moidvk check-code -f src/app.js --json
+
+# Analyze from stdin
+echo "const x = 1;" | moidvk check-code --stdin
 ```
 
-### Pipeline Integration
-
-#### Git Hooks
-
-Create `.git/hooks/pre-commit`:
+### Rust Analysis
 
 ```bash
-#!/bin/sh
-# Check staged JavaScript files
-files=$(git diff --cached --name-only --diff-filter=ACM | grep '\.js$')
-for file in $files; do
-  moidvk check-production -f "$file" --strict || exit 1
-done
+# Analyze Rust file
+moidvk rust-practices -f src/lib.rs
+
+# Use specific Rust edition
+moidvk rust-practices -f src/lib.rs --edition 2021
+
+# Enable pedantic lints
+moidvk rust-practices -f src/lib.rs --pedantic
+
+# Filter by category
+moidvk rust-practices -f src/lib.rs --category performance
+
+# Set lint level
+moidvk rust-practices -f src/lib.rs --level deny
 ```
 
-#### CI/CD Integration
-
-GitHub Actions example:
-
-```yaml
-name: Code Quality Check
-on: [push, pull_request]
-jobs:
-  quality:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: oven-sh/setup-bun@v1
-      - run: bun install -g moidvk
-      - run: moidvk check-production -f src/index.js --strict
-      - run: moidvk scan-security --severity high
-```
-
-#### VS Code Tasks
-
-`.vscode/tasks.json`:
-
-```json
-{
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "Check Code Quality",
-      "type": "shell",
-      "command": "moidvk",
-      "args": ["check-code", "-f", "${file}"],
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      }
-    }
-  ]
-}
-```
-
-### Scripting Examples
-
-#### Quality Check Script
+### Python Analysis
 
 ```bash
-#!/bin/bash
-# quality-check.sh
+# Analyze Python file
+moidvk python-analyze -f src/app.py
 
-echo "🔍 Running code quality checks..."
+# Specify Python version
+moidvk python-analyze -f src/app.py --python-version 3
 
-# Check all JavaScript files
-find . -name "*.js" -not -path "./node_modules/*" | while read file; do
-  echo "Checking $file..."
-  moidvk check-code -f "$file" --production || exit 1
-done
+# Select specific rules
+moidvk python-analyze -f src/app.py --select E,F,W
 
+# Ignore specific rules
+moidvk python-analyze -f src/app.py --ignore E501,W503
+
+# Filter by category
+moidvk python-analyze -f src/app.py --category security
+```
+
+## 🎨 Formatting Commands
+
+### Multi-Language Formatting
+
+```bash
+# Format JavaScript/TypeScript
+moidvk format -f src/app.js
+
+# Format multiple files
+moidvk format -f src/*.js
+
+# Check formatting without changes
+moidvk format -f src/app.js --check
+
+# Format from stdin
+echo "const x=1;" | moidvk format --stdin
+
+# Format with specific config
+moidvk format -f src/app.js --config .prettierrc
+```
+
+### Rust Formatting
+
+```bash
+# Format Rust file
+moidvk rust-format -f src/lib.rs
+
+# Check formatting
+moidvk rust-format -f src/lib.rs --check
+
+# Custom line width
+moidvk rust-format -f src/lib.rs --max-width 120
+
+# Specific edition
+moidvk rust-format -f src/lib.rs --edition 2021
+```
+
+### Python Formatting
+
+```bash
+# Format Python file
+moidvk python-format -f src/app.py
+
+# Custom line length
+moidvk python-format -f src/app.py --line-length 100
+
+# Check formatting
+moidvk python-format -f src/app.py --check
+
+# Skip string normalization
+moidvk python-format -f src/app.py --skip-string-normalization
+```
+
+## 🔒 Security Commands
+
+### Vulnerability Scanning
+
+```bash
+# Scan project dependencies
+moidvk scan-security
+
+# Scan specific directory
+moidvk scan-security -p /path/to/project
+
+# Filter by severity
+moidvk scan-security --severity high
+
+# Production dependencies only
+moidvk scan-security --production
+
+# Output detailed report
+moidvk scan-security --format detailed
+
+# Save report to file
+moidvk scan-security --output security-report.json
+```
+
+### Safety Rules
+
+```bash
+# Check NASA JPL safety rules
+moidvk check-safety -f src/critical.js
+
+# Analyze from stdin
+cat src/app.js | moidvk check-safety --stdin
+```
+
+### Language-Specific Security
+
+```bash
+# Rust safety check
+moidvk rust-safety -f src/lib.rs
+
+# Strict mode
+moidvk rust-safety -f src/lib.rs --strict
+
+# Python security scan
+moidvk python-security -f src/app.py
+
+# Filter by confidence
+moidvk python-security -f src/app.py --confidence high
+```
+
+## ⚡ Performance Commands
+
+### JavaScript Performance
+
+```bash
+# Analyze JavaScript performance
+moidvk js-performance -f src/app.js
+
+# Focus on specific category
+moidvk js-performance -f src/app.js --category memory
+
+# Browser-specific analysis
+moidvk js-performance -f src/app.js --focus browser
+
+# Include metrics
+moidvk js-performance -f src/app.js --include-metrics
+```
+
+### Rust Performance
+
+```bash
+# Analyze Rust performance
+moidvk rust-performance -f src/lib.rs
+
+# Focus on allocations
+moidvk rust-performance -f src/lib.rs --category allocation
+
+# Memory-focused analysis
+moidvk rust-performance -f src/lib.rs --focus memory
+```
+
+### Python Performance
+
+```bash
+# Analyze Python performance
+moidvk python-performance -f src/app.py
+
+# Data science focus
+moidvk python-performance -f src/app.py --focus data_science
+
+# Include complexity analysis
+moidvk python-performance -f src/app.py --include-complexity
+```
+
+### Bundle Analysis
+
+```bash
+# Analyze bundle size
+moidvk bundle-size
+
+# Specific entry point
+moidvk bundle-size --entry src/index.js
+
+# Custom size budget
+moidvk bundle-size --budget 200
+
+# Analyze tree shaking
+moidvk bundle-size --tree-shaking
+```
+
+## 🚀 Production Commands
+
+### Production Readiness
+
+```bash
 # Check production readiness
-find . -name "*.js" -not -path "./node_modules/*" | while read file; do
-  echo "Checking production readiness for $file..."
-  moidvk check-production -f "$file" --strict || exit 1
-done
+moidvk check-production -f src/app.js
 
-# Scan for security vulnerabilities
-echo "🔒 Scanning for security vulnerabilities..."
-moidvk scan-security --severity high || exit 1
+# Strict mode
+moidvk check-production -f src/app.js --strict
 
-echo "✅ All checks passed!"
+# Filter by category
+moidvk check-production -f src/app.js --category console-logs
+
+# Rust production check
+moidvk rust-production -f src/lib.rs
 ```
 
-#### Format All Files Script
+### Accessibility
 
 ```bash
-#!/bin/bash
-# format-all.sh
+# Check accessibility
+moidvk check-accessibility -f src/component.jsx
 
-echo "🎨 Formatting all code files..."
+# WCAG AAA compliance
+moidvk check-accessibility -f src/component.jsx --standard AAA
 
-# Format JavaScript files
-find . -name "*.js" -not -path "./node_modules/*" | while read file; do
-  echo "Formatting $file..."
-  moidvk format -f "$file" -o "$file"
-done
+# Specific rule set
+moidvk check-accessibility -f src/component.jsx --rule-set forms
 
-# Format TypeScript files
-find . -name "*.ts" -not -path "./node_modules/*" | while read file; do
-  echo "Formatting $file..."
-  moidvk format -f "$file" -o "$file"
-done
-
-# Format JSX/TSX files
-find . -name "*.jsx" -o -name "*.tsx" | grep -v node_modules | while read file; do
-  echo "Formatting $file..."
-  moidvk format -f "$file" -o "$file"
-done
-
-echo "✅ All files formatted!"
+# Include color contrast
+moidvk check-accessibility -f src/component.jsx --include-contrast
 ```
 
-### JSON Output Processing
-
-#### Parse Results with jq
+### API Validation
 
 ```bash
-# Get issue count
-moidvk check-code -f app.js --format json | jq '.issues | length'
+# Validate GraphQL schema
+moidvk graphql-schema -f schema.graphql
 
-# Get high severity issues
-moidvk scan-security --format json | jq '.vulnerabilities[] | select(.severity == "high")'
+# Check GraphQL query
+moidvk graphql-query -f query.graphql --schema schema.graphql
 
-# Get production readiness score
-moidvk check-production -f server.js --format json | jq '.score'
+# Validate OpenAPI spec
+moidvk openapi-validate -f api.yaml
 
-# Get accessibility violations
-moidvk check-accessibility -f page.html --format json | jq '.violations[] | .description'
+# Check Redux patterns
+moidvk redux-patterns -f src/store.js
 ```
 
-#### Generate Reports
+## 🛠️ Utility Commands
+
+### Testing
 
 ```bash
-#!/bin/bash
-# generate-report.sh
+# Analyze JavaScript tests
+moidvk js-test -f tests/app.test.js
 
-echo "📊 Generating quality report..."
+# Python test analysis
+moidvk python-test -f tests/test_app.py
 
-# Create report directory
-mkdir -p reports
-
-# Generate code quality report
-moidvk check-code -f src/ -d src/ --format json > reports/code-quality.json
-
-# Generate security report
-moidvk scan-security --format json > reports/security.json
-
-# Generate production readiness report
-find . -name "*.js" | head -10 | while read file; do
-  moidvk check-production -f "$file" --format json >> reports/production-readiness.json
-done
-
-echo "📄 Reports generated in reports/ directory"
+# Include metrics
+moidvk js-test -f tests/ --include-metrics
 ```
 
-## 📊 Output Formats
-
-### Text Format (Default)
-
-Human-readable output with emojis and formatting:
-
-```
-🔍 Code Quality Analysis Results:
-
-✅ Passed: 3 checks
-⚠️ Warnings: 2 issues
-❌ Errors: 1 issue
-
-Issues Found:
-- Line 2: Use '===' instead of '==' for comparison
-- Line 3: Avoid console.log in production code
-- Line 1: Consider using 'const' instead of 'var'
-
-💡 Recommendations:
-- Use strict equality operators (===)
-- Remove debug statements before production
-- Prefer const/let over var
-```
-
-### JSON Format
-
-Machine-readable output for automation:
-
-```json
-{
-  "tool": "check_code_practices",
-  "timestamp": "2025-07-18T14:30:00Z",
-  "file": "src/app.js",
-  "score": 85,
-  "issues": [
-    {
-      "line": 2,
-      "column": 7,
-      "severity": "error",
-      "rule": "eqeqeq",
-      "message": "Use '===' instead of '==' for comparison"
-    }
-  ],
-  "summary": {
-    "passed": 3,
-    "warnings": 2,
-    "errors": 1
-  }
-}
-```
-
-### Detailed Format
-
-Comprehensive output with additional context:
-
-```
-🔍 Code Quality Analysis Results:
-
-📁 File: src/app.js
-📅 Timestamp: 2025-07-18T14:30:00Z
-🎯 Tool: check_code_practices
-📊 Score: 85/100
-
-✅ Passed Checks (3):
-  ✓ Variable declarations use const/let
-  ✓ Function names follow camelCase
-  ✓ No unused variables detected
-
-⚠️ Warnings (2):
-  - Line 2: Use '===' instead of '==' for comparison
-  - Line 3: Avoid console.log in production code
-
-❌ Errors (1):
-  - Line 1: Consider using 'const' instead of 'var'
-
-💡 Recommendations:
-  - Use strict equality operators (===)
-  - Remove debug statements before production
-  - Prefer const/let over var
-
-🔧 Fix Commands:
-  - Replace '==' with '===' on line 2
-  - Remove console.log on line 3
-  - Change 'var' to 'const' on line 1
-```
-
-## 🚨 Exit Codes
-
-The CLI uses standard exit codes:
-
-- `0` - Success, no issues found or all operations completed
-- `1` - Error or issues found (warnings/errors in code analysis)
-- `2` - Invalid usage or arguments
-- `3` - Configuration error
-- `4` - File not found or permission denied
-- `5` - Network or external service error
-
-### Handling Exit Codes
+### Documentation
 
 ```bash
-#!/bin/bash
-# check-with-exit-codes.sh
+# Check documentation quality
+moidvk doc-quality -f src/
 
-moidvk check-code -f app.js
-case $? in
-  0) echo "✅ No issues found" ;;
-  1) echo "⚠️ Issues found but fixable" ;;
-  2) echo "❌ Invalid command usage" ;;
-  3) echo "❌ Configuration error" ;;
-  4) echo "❌ File not found" ;;
-  5) echo "❌ Network error" ;;
-esac
+# Specific documentation type
+moidvk doc-quality -f src/ --doc-type api
+
+# Include spelling check
+moidvk doc-quality -f README.md --check-spelling
 ```
 
-## 🔧 Configuration
+### Infrastructure
 
-### Global Configuration
+```bash
+# Scan container security
+moidvk container-security
 
-Create `~/.moidvk/config.json`:
+# Analyze CI/CD configuration
+moidvk cicd-analyze
 
-```json
-{
-  "defaults": {
-    "security_level": "balanced",
-    "explicit_consent": true,
-    "max_file_size": 10485760,
-    "timeout": 30000
-  },
-  "tools": {
-    "check_code_practices": {
-      "production": false,
-      "strict": false,
-      "limit": 50
-    },
-    "format_code": {
-      "check_only": false
-    },
-    "scan_security_vulnerabilities": {
-      "severity": "low",
-      "production_only": false
-    }
-  }
-}
+# Check license compliance
+moidvk license-scan
+
+# Validate environment config
+moidvk env-validate
 ```
 
-### Project Configuration
+### Git Analysis
+
+```bash
+# Git blame analysis
+moidvk git-blame -f src/app.js
+
+# Specific line range
+moidvk git-blame -f src/app.js --start 10 --end 20
+
+# Show email addresses
+moidvk git-blame -f src/app.js --show-email
+```
+
+## 🌐 Global Options
+
+### Common Options
+
+```bash
+# Verbose output
+moidvk <command> --verbose
+moidvk <command> -v
+
+# Quiet mode
+moidvk <command> --quiet
+moidvk <command> -q
+
+# JSON output
+moidvk <command> --json
+
+# Output to file
+moidvk <command> --output report.json
+moidvk <command> -o report.json
+
+# Configuration file
+moidvk <command> --config .moidvk.json
+moidvk <command> -c .moidvk.json
+
+# Working directory
+moidvk <command> --cwd /path/to/project
+
+# Timeout (in seconds)
+moidvk <command> --timeout 60
+```
+
+### Input Options
+
+```bash
+# File input
+moidvk <command> --file path/to/file
+moidvk <command> -f path/to/file
+
+# Directory input
+moidvk <command> --directory path/to/dir
+moidvk <command> -d path/to/dir
+
+# Stdin input
+moidvk <command> --stdin
+
+# Multiple files
+moidvk <command> -f file1.js -f file2.js
+
+# Glob patterns
+moidvk <command> -f "src/**/*.js"
+```
+
+### Filtering Options
+
+```bash
+# Severity filtering
+moidvk <command> --severity error
+moidvk <command> --severity warning,error
+
+# Category filtering
+moidvk <command> --category security
+moidvk <command> --category security,performance
+
+# Limit results
+moidvk <command> --limit 50
+
+# Offset for pagination
+moidvk <command> --offset 10
+
+# Sort results
+moidvk <command> --sort-by severity
+moidvk <command> --sort-order desc
+```
+
+## ⚙️ Configuration
+
+### Configuration File
 
 Create `.moidvk.json` in your project root:
 
 ```json
 {
-  "project": {
-    "name": "my-project",
-    "security_level": "strict",
-    "explicit_consent": true
+  "defaultSeverity": "warning",
+  "outputFormat": "json",
+  "caching": {
+    "enabled": true,
+    "ttl": 3600
   },
   "tools": {
     "check_code_practices": {
       "production": true,
-      "strict": true
+      "ruleCategory": "all"
     },
-    "check_production_readiness": {
-      "strict": true
+    "scan_security_vulnerabilities": {
+      "severity": "medium"
     }
   },
-  "ignore": [
-    "node_modules/**",
-    "dist/**",
-    "*.min.js"
-  ]
+  "ignore": ["node_modules/", "dist/", "*.min.js"]
 }
 ```
 
-## 🚨 Troubleshooting
+### Environment Variables
+
+```bash
+# Performance settings
+export MOIDVK_MAX_CONCURRENT=5
+export MOIDVK_TIMEOUT=30000
+
+# Feature flags
+export MOIDVK_USE_RUST=true
+export MOIDVK_ENABLE_CACHE=true
+
+# Logging
+export MOIDVK_LOG_LEVEL=info
+export MOIDVK_LOG_FORMAT=json
+
+# Paths
+export MOIDVK_CONFIG_PATH=/path/to/config
+export MOIDVK_CACHE_DIR=/path/to/cache
+```
+
+### Per-Command Configuration
+
+```bash
+# Override config for specific command
+moidvk check-code -f src/app.js --config-override '{"production": true}'
+
+# Disable caching for command
+moidvk check-code -f src/app.js --no-cache
+
+# Force JavaScript fallback
+moidvk check-code -f src/app.js --no-rust
+```
+
+## 📊 Examples & Workflows
+
+### Pre-Commit Hook
+
+```bash
+#!/bin/bash
+# .git/hooks/pre-commit
+
+# Format code
+moidvk format -d src/ --check || {
+  echo "Code formatting required"
+  exit 1
+}
+
+# Check code quality
+moidvk check-code -d src/ --production --severity error || {
+  echo "Code quality issues found"
+  exit 1
+}
+
+# Security scan
+moidvk scan-security --severity high || {
+  echo "Security vulnerabilities found"
+  exit 1
+}
+```
+
+### CI/CD Pipeline
+
+```bash
+#!/bin/bash
+# ci/analyze.sh
+
+set -e
+
+echo "Running MOIDVK analysis..."
+
+# Code quality
+moidvk check-code -d src/ --production --json > reports/code-quality.json
+
+# Security scan
+moidvk scan-security --json > reports/security.json
+
+# Performance analysis
+moidvk js-performance -d src/ --json > reports/performance.json
+
+# Production readiness
+moidvk check-production -d src/ --strict --json > reports/production.json
+
+# Accessibility check
+moidvk check-accessibility -d src/ --json > reports/accessibility.json
+
+echo "Analysis complete. Reports saved to reports/"
+```
+
+### Development Workflow
+
+```bash
+#!/bin/bash
+# scripts/dev-check.sh
+
+# Quick development checks
+echo "🔍 Analyzing code..."
+moidvk check-code -f $1 --severity warning
+
+echo "🎨 Checking format..."
+moidvk format -f $1 --check
+
+echo "🔒 Security check..."
+moidvk scan-security --severity medium
+
+echo "⚡ Performance check..."
+moidvk js-performance -f $1 --category memory,cpu
+
+echo "✅ Development checks complete!"
+```
+
+### Batch Processing
+
+```bash
+# Process multiple files
+find src/ -name "*.js" -exec moidvk check-code -f {} \;
+
+# Process with xargs
+find src/ -name "*.js" | xargs -I {} moidvk check-code -f {}
+
+# Parallel processing
+find src/ -name "*.js" | xargs -P 4 -I {} moidvk check-code -f {}
+```
+
+## 🔧 Advanced Usage
+
+### Piping and Chaining
+
+```bash
+# Chain commands
+moidvk check-code -f src/app.js --json | jq '.issues[] | select(.severity == "error")'
+
+# Combine with other tools
+moidvk scan-security --json | jq -r '.vulnerabilities[].package' | sort | uniq
+
+# Filter and format
+moidvk check-code -d src/ --json | jq '.issues[] | select(.line > 100)'
+```
+
+### Custom Scripts
+
+```bash
+#!/bin/bash
+# Custom analysis script
+
+FILES=$(find src/ -name "*.js" -o -name "*.ts")
+
+for file in $FILES; do
+  echo "Analyzing $file..."
+
+  # Code quality
+  moidvk check-code -f "$file" --production
+
+  # Performance
+  moidvk js-performance -f "$file" --category memory
+
+  # Production readiness
+  moidvk check-production -f "$file"
+done
+```
+
+### Integration with Make
+
+```makefile
+# Makefile
+.PHONY: analyze format security
+
+analyze:
+	moidvk check-code -d src/ --production
+
+format:
+	moidvk format -d src/
+
+security:
+	moidvk scan-security --severity medium
+
+all: format analyze security
+```
+
+## 🆘 Troubleshooting
 
 ### Common Issues
 
-#### "Command not found"
-
 ```bash
-# Check installation
-which moidvk
+# Check system status
+moidvk doctor --verbose
 
-# Reinstall globally
-bun install -g moidvk
+# Clear cache
+moidvk cache clear
 
-# Check PATH
-echo $PATH
-```
+# Force rebuild
+moidvk rebuild --force
 
-#### "Permission denied"
+# Use JavaScript fallback
+MOIDVK_USE_JS_FALLBACK=true moidvk check-code -f src/app.js
 
-```bash
-# Fix permissions
-chmod +x $(which moidvk)
-
-# Check ownership
-ls -la $(which moidvk)
-```
-
-#### "File not found"
-
-```bash
-# Check file path
-ls -la src/app.js
-
-# Use absolute path
-moidvk check-code -f /full/path/to/file.js
-```
-
-#### "Invalid JSON output"
-
-```bash
-# Check JSON syntax
-moidvk check-code -f app.js --format json | jq .
-
-# Validate output
-moidvk check-code -f app.js --format json > output.json
-cat output.json | jq .
-```
-
-### Debug Mode
-
-Enable debug mode for detailed troubleshooting:
-
-```bash
-# Enable debug logging
-DEBUG=true moidvk check-code -f app.js
-
-# Verbose output
-moidvk check-code -f app.js --debug
-
-# Check server logs
-moidvk serve --debug
+# Debug mode
+MOIDVK_DEBUG=true moidvk check-code -f src/app.js
 ```
 
 ### Performance Issues
 
 ```bash
-# Check file size limits
-moidvk check-code -f large-file.js --max-size 10485760
+# Reduce concurrency
+moidvk check-code -d src/ --max-concurrent 2
 
-# Use pagination for large results
-moidvk check-code -f app.js --limit 10 --offset 0
+# Increase timeout
+moidvk check-code -d src/ --timeout 120
 
-# Process files in batches
-find . -name "*.js" | xargs -n 10 moidvk check-code
+# Use streaming mode
+moidvk check-code -d src/ --stream
 ```
 
-## 📚 Next Steps
+## 📚 Additional Resources
 
-After mastering the CLI:
-
-1. **Explore [Tool Reference](tool-reference.md)** - Learn about all available tools
-2. **Check [Workflow Examples](workflow-examples.md)** - See real-world usage patterns
-3. **Review [Production Deployment](production-deployment.md)** - Prepare for production use
-4. **Set up CI/CD integration** - Automate your workflow
-
-## 🆘 Getting Help
-
-For CLI-specific issues:
-
-1. **Check this troubleshooting section**
-2. **Run with debug mode**: `DEBUG=true moidvk <command>`
-3. **Check help**: `moidvk <command> --help`
-4. **Review [Troubleshooting Guide](troubleshooting.md)**
-5. **Create an issue** in the GitHub repository
+- **[Tool Reference](../technical/tool-reference.md)** - Complete tool documentation
+- **[Configuration Guide](../technical/configuration.md)** - Advanced configuration
+- **[Troubleshooting](troubleshooting.md)** - Common issues and solutions
+- **[Workflow Examples](workflow-examples.md)** - Real-world usage patterns
 
 ---
 
-**CLI Mastery Complete!** 🎉 You now have full command-line control over MOIDVK. Explore the [Tool Reference](tool-reference.md) to learn about all available tools and their options.
+**Need help?** Use `moidvk --help` or `moidvk <command> --help` for detailed command information.

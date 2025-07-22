@@ -1,907 +1,668 @@
 # Troubleshooting Guide
 
-This comprehensive troubleshooting guide helps you resolve common issues with MOIDVK installation, configuration, and usage.
+This guide helps you resolve common issues with MOIDVK installation, configuration, and usage.
 
-## 🎯 Overview
+## 📋 Quick Diagnostics
 
-This guide covers troubleshooting for:
-- Installation issues
-- MCP integration problems
-- Tool-specific issues
-- Performance problems
-- Security issues
-- Network and connectivity problems
-- Platform-specific issues
-
-## 🔍 Quick Diagnosis
-
-### Health Check Commands
+### System Health Check
 
 ```bash
-# Check MOIDVK installation
-moidvk --version
+# Run comprehensive diagnostics
+moidvk doctor
 
-# Check server status
-moidvk serve --test
+# Verbose diagnostics with detailed output
+moidvk doctor --verbose
 
-# Check tool availability
-moidvk list-tools
-
-# Check configuration
-moidvk config --validate
+# Check specific components
+moidvk doctor --check-rust
+moidvk doctor --check-python
+moidvk doctor --check-mcp
 ```
 
-### Common Error Patterns
+### Expected Healthy Output
 
-| Error Pattern | Likely Cause | Solution |
-|---------------|--------------|----------|
-| `Command not found` | Installation issue | Reinstall MOIDVK |
-| `Permission denied` | File permissions | Fix file permissions |
-| `Connection refused` | Server not running | Start MCP server |
-| `Timeout` | Performance issue | Check system resources |
-| `Validation error` | Configuration issue | Validate configuration |
-
-## 🚀 Installation Issues
-
-### "Command not found: moidvk"
-
-**Symptoms**: Terminal reports command not found
-
-**Diagnosis**:
-```bash
-# Check if moidvk is installed
-which moidvk
-
-# Check PATH environment
-echo $PATH
-
-# Check if bun is available
-which bun
 ```
+✅ MOIDVK v1.0.0
+✅ Rust core: Available (native)
+✅ Python tools: Available
+✅ MCP server: Ready
+✅ Node.js: v18.17.0
+✅ Bun: v1.0.25
+✅ All 37 tools: Functional
+⚡ Performance: Optimal
+```
+
+## 🚨 Common Issues
+
+### Installation Issues
+
+#### Issue: `command not found: moidvk`
+
+**Symptoms**: CLI command not recognized after installation
 
 **Solutions**:
 
-#### Solution 1: Reinstall Globally
 ```bash
-# Uninstall existing installation
-bun uninstall -g moidvk
+# Check if globally installed
+npm list -g @moikas/moidvk
+bun pm ls -g | grep moidvk
 
 # Reinstall globally
-bun install -g moidvk
+bun install -g @moikas/moidvk
 
-# Verify installation
-moidvk --version
+# Check PATH
+echo $PATH
+which moidvk
+
+# Use npx as alternative
+npx @moikas/moidvk --version
 ```
 
-#### Solution 2: Fix PATH Issues
-```bash
-# Add bun to PATH (add to ~/.bashrc, ~/.zshrc, or ~/.profile)
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
+#### Issue: Permission denied during installation
 
-# Reload shell configuration
-source ~/.bashrc  # or ~/.zshrc
-```
-
-#### Solution 3: Manual Installation
-```bash
-# Clone repository
-git clone https://github.com/your-org/moidvk.git
-cd moidvk
-
-# Install dependencies
-bun install
-
-# Create global link
-bun link
-
-# Verify installation
-moidvk --help
-```
-
-### "Permission denied" Errors
-
-**Symptoms**: Permission errors during installation or execution
-
-**Diagnosis**:
-```bash
-# Check file permissions
-ls -la $(which moidvk)
-
-# Check directory permissions
-ls -la /opt/moidvk/
-
-# Check user permissions
-whoami
-groups
-```
+**Symptoms**: `EACCES` or permission errors during `npm install -g`
 
 **Solutions**:
 
-#### Solution 1: Fix File Permissions
 ```bash
-# Fix executable permissions
-chmod +x $(which moidvk)
+# Fix npm permissions (Linux/macOS)
+sudo chown -R $(whoami) ~/.npm
+sudo chown -R $(whoami) ~/.bun
 
-# Fix directory permissions
-sudo chown -R $USER:$USER /opt/moidvk/
-chmod 755 /opt/moidvk/
+# Use npm prefix (alternative)
+npm config set prefix ~/.npm-global
+export PATH=~/.npm-global/bin:$PATH
+
+# Use sudo (not recommended)
+sudo npm install -g @moikas/moidvk
 ```
 
-#### Solution 2: Install with Correct Permissions
-```bash
-# Install with proper ownership
-sudo bun install -g moidvk
-sudo chown -R $USER:$USER ~/.bun/
+#### Issue: Rust build failures
 
-# Or install locally
-bun install moidvk
+**Symptoms**: Native module compilation errors
+
+**Solutions**:
+
+```bash
+# Update Rust toolchain
+rustup update stable
+
+# Install required targets
+rustup target add x86_64-unknown-linux-gnu
+
+# Install build dependencies (Ubuntu/Debian)
+sudo apt-get install build-essential pkg-config libssl-dev
+
+# Install build dependencies (CentOS/RHEL)
+sudo yum groupinstall "Development Tools"
+sudo yum install openssl-devel
+
+# Clear cache and rebuild
+cd ~/.bun/install/cache/@moikas/moidvk
+cargo clean
+bun run build:rust
+
+# Use JavaScript fallback
+export MOIDVK_USE_JS_FALLBACK=true
 ```
 
-### Dependency Installation Issues
+### Runtime Issues
 
-**Symptoms**: Errors during `bun install`
+#### Issue: MCP server fails to start
 
-**Diagnosis**:
+**Symptoms**: Server crashes or fails to bind to port
+
+**Solutions**:
+
 ```bash
-# Check bun version
-bun --version
+# Check port availability
+lsof -i :3000
+netstat -tulpn | grep 3000
 
-# Check Node.js version
-node --version
+# Use different port
+moidvk serve --port 3001
 
-# Check available memory
+# Check for conflicting processes
+ps aux | grep moidvk
+pkill -f moidvk
+
+# Start with verbose logging
+moidvk serve --verbose
+
+# Check system resources
 free -h
-
-# Check disk space
 df -h
 ```
 
+#### Issue: Tools return errors or timeouts
+
+**Symptoms**: Individual tools fail with timeout or error messages
+
 **Solutions**:
 
-#### Solution 1: Update Dependencies
 ```bash
-# Update bun
-curl -fsSL https://bun.sh/install | bash
+# Increase timeout
+moidvk check-code -f app.js --timeout 60
 
-# Update Node.js
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-sudo apt-get install -y nodejs
+# Reduce concurrency
+export MOIDVK_MAX_CONCURRENT=2
 
-# Clear cache and reinstall
-bun pm cache rm
-bun install
+# Clear cache
+moidvk cache clear
+
+# Use JavaScript fallback
+MOIDVK_USE_JS_FALLBACK=true moidvk check-code -f app.js
+
+# Check file permissions
+ls -la app.js
+chmod 644 app.js
 ```
 
-#### Solution 2: Fix Memory Issues
+#### Issue: High memory usage
+
+**Symptoms**: System becomes slow, out of memory errors
+
+**Solutions**:
+
 ```bash
-# Increase swap space
+# Monitor memory usage
+moidvk benchmark --memory
+
+# Reduce concurrent operations
+export MOIDVK_MAX_CONCURRENT=2
+
+# Enable streaming mode for large files
+moidvk check-code -d src/ --stream
+
+# Increase system swap
+sudo swapon --show
 sudo fallocate -l 2G /swapfile
 sudo chmod 600 /swapfile
 sudo mkswap /swapfile
 sudo swapon /swapfile
-
-# Make permanent
-echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 ```
 
-## 🔧 MCP Integration Issues
+### Configuration Issues
 
-### "MCP server connection failed"
+#### Issue: Configuration not loaded
+
+**Symptoms**: Custom settings ignored, default behavior used
+
+**Solutions**:
+
+```bash
+# Check config file location
+ls -la .moidvk.json
+ls -la ~/.config/moidvk/config.json
+
+# Validate JSON syntax
+cat .moidvk.json | jq .
+
+# Use explicit config path
+moidvk check-code -f app.js --config /path/to/config.json
+
+# Check environment variables
+env | grep MOIDVK
+
+# Debug config loading
+MOIDVK_DEBUG=true moidvk check-code -f app.js
+```
+
+#### Issue: MCP client connection failures
 
 **Symptoms**: MCP client can't connect to MOIDVK server
 
-**Diagnosis**:
-```bash
-# Check if server is running
-ps aux | grep moidvk
-
-# Check server logs
-moidvk serve --debug
-
-# Check port availability
-netstat -tlnp | grep 3000
-```
-
 **Solutions**:
 
-#### Solution 1: Start Server Manually
 ```bash
-# Start server in foreground
-moidvk serve
+# Test server manually
+moidvk serve --test
 
-# Start with debug mode
-moidvk serve --debug
+# Check MCP client configuration
+cat ~/.config/claude-desktop/config.json
 
-# Start on specific port
-moidvk serve --port 3001
-```
+# Verify command path
+which moidvk
 
-#### Solution 2: Fix Configuration
-```json
-// Claude Desktop configuration
-{
-  "mcpServers": {
-    "moidvk": {
-      "command": "moidvk",
-      "args": ["serve"],
-      "env": {
-        "NODE_ENV": "development"
-      }
-    }
-  }
-}
-```
+# Test with curl
+curl -X POST http://localhost:3000/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"method": "tools/list"}'
 
-#### Solution 3: Check Network Issues
-```bash
-# Test local connectivity
-curl http://localhost:3000/health
-
-# Check firewall
+# Check firewall settings
 sudo ufw status
-
-# Test port availability
-telnet localhost 3000
-```
-
-### "Tool not available" Errors
-
-**Symptoms**: Specific tools not showing up in MCP client
-
-**Diagnosis**:
-```bash
-# Check available tools
-moidvk list-tools
-
-# Check server logs
-moidvk serve --verbose
-
-# Test individual tools
-moidvk check-code --help
-```
-
-**Solutions**:
-
-#### Solution 1: Restart MCP Client
-```bash
-# Restart Claude Desktop
-# Restart Cursor
-# Restart VS Code
-```
-
-#### Solution 2: Check Tool Registration
-```bash
-# Verify tool installation
-moidvk install-tools
-
-# Check tool dependencies
-moidvk check-dependencies
-```
-
-#### Solution 3: Update Tools
-```bash
-# Update all tools
-moidvk update-tools
-
-# Update specific tool
-moidvk update-tool check-code-practices
-```
-
-## 🛠️ Tool-Specific Issues
-
-### Code Quality Tool Issues
-
-#### "ESLint configuration error"
-
-**Symptoms**: ESLint-related errors in code quality checks
-
-**Solutions**:
-```bash
-# Check ESLint configuration
-moidvk check-config eslint
-
-# Create default ESLint config
-moidvk init-eslint
-
-# Use custom ESLint config
-moidvk check-code -f app.js --eslint-config .eslintrc.json
-```
-
-#### "Prettier formatting error"
-
-**Symptoms**: Prettier-related errors in code formatting
-
-**Solutions**:
-```bash
-# Check Prettier configuration
-moidvk check-config prettier
-
-# Create default Prettier config
-moidvk init-prettier
-
-# Use custom Prettier config
-moidvk format -f app.js --prettier-config .prettierrc
-```
-
-### Security Tool Issues
-
-#### "Vulnerability scan failed"
-
-**Symptoms**: Security vulnerability scanning errors
-
-**Solutions**:
-```bash
-# Check npm/bun installation
-npm --version
-bun --version
-
-# Clear package manager cache
-npm cache clean --force
-bun pm cache rm
-
-# Check network connectivity
-ping registry.npmjs.org
-
-# Use alternative registry
-moidvk scan-security --registry https://registry.npmjs.org/
-```
-
-#### "Production readiness check error"
-
-**Symptoms**: Production readiness analysis failures
-
-**Solutions**:
-```bash
-# Check file permissions
-ls -la src/
-
-# Check file encoding
-file src/app.js
-
-# Use verbose mode
-moidvk check-production -f src/app.js --verbose
-```
-
-### Accessibility Tool Issues
-
-#### "Puppeteer installation error"
-
-**Symptoms**: Accessibility testing fails due to Puppeteer issues
-
-**Solutions**:
-```bash
-# Install system dependencies
-sudo apt-get install -y \
-  gconf-service \
-  libasound2 \
-  libatk1.0-0 \
-  libc6 \
-  libcairo2 \
-  libcups2 \
-  libdbus-1-3 \
-  libexpat1 \
-  libfontconfig1 \
-  libgcc1 \
-  libgconf-2-4 \
-  libgdk-pixbuf2.0-0 \
-  libglib2.0-0 \
-  libgtk-3-0 \
-  libnspr4 \
-  libpango-1.0-0 \
-  libpangocairo-1.0-0 \
-  libstdc++6 \
-  libx11-6 \
-  libx11-xcb1 \
-  libxcb1 \
-  libxcomposite1 \
-  libxcursor1 \
-  libxdamage1 \
-  libxext6 \
-  libxfixes3 \
-  libxi6 \
-  libxrandr2 \
-  libxrender1 \
-  libxss1 \
-  libxtst6 \
-  ca-certificates \
-  fonts-liberation \
-  libappindicator1 \
-  libnss3 \
-  lsb-release \
-  xdg-utils \
-  wget
-
-# Reinstall Puppeteer
-npm uninstall puppeteer
-npm install puppeteer
-```
-
-#### "Accessibility test timeout"
-
-**Symptoms**: Accessibility tests timeout or hang
-
-**Solutions**:
-```bash
-# Increase timeout
-moidvk check-accessibility -f page.html --timeout 60000
-
-# Use headless mode
-moidvk check-accessibility -f page.html --headless
-
-# Skip contrast checking
-moidvk check-accessibility -f page.html --no-contrast
-```
-
-### GraphQL Tool Issues
-
-#### "GraphQL schema validation error"
-
-**Symptoms**: GraphQL schema validation failures
-
-**Solutions**:
-```bash
-# Check GraphQL syntax
-moidvk validate-graphql-syntax schema.graphql
-
-# Use specific GraphQL version
-moidvk check-graphql-schema -f schema.graphql --version 2021
-
-# Check schema introspection
-moidvk introspect-schema schema.graphql
-```
-
-#### "GraphQL query analysis error"
-
-**Symptoms**: GraphQL query analysis failures
-
-**Solutions**:
-```bash
-# Check query syntax
-moidvk validate-graphql-query query.graphql
-
-# Use schema validation
-moidvk check-graphql-query -f query.graphql --schema schema.graphql
-
-# Increase complexity limits
-moidvk check-graphql-query -f query.graphql --max-complexity 200
-```
-
-### Redux Tool Issues
-
-#### "Redux pattern detection error"
-
-**Symptoms**: Redux pattern analysis failures
-
-**Solutions**:
-```bash
-# Specify code type
-moidvk check-redux -f store.js --code-type store
-
-# Use strict mode
-moidvk check-redux -f reducer.js --strict
-
-# Check Redux Toolkit detection
-moidvk check-redux -f slice.js --toolkit
-```
-
-## ⚡ Performance Issues
-
-### Slow Tool Execution
-
-**Symptoms**: Tools take too long to execute
-
-**Diagnosis**:
-```bash
-# Check system resources
-top
-free -h
-df -h
-
-# Check tool performance
-moidvk benchmark
-
-# Check memory usage
-ps aux | grep moidvk
-```
-
-**Solutions**:
-
-#### Solution 1: Optimize System Resources
-```bash
-# Increase available memory
-sudo sysctl vm.swappiness=10
-
-# Optimize disk I/O
-sudo ionice -c 2 -n 7 -p $$
-
-# Use SSD storage
-# Move MOIDVK to SSD if possible
-```
-
-#### Solution 2: Configure Tool Limits
-```bash
-# Limit file size
-moidvk check-code -f app.js --max-size 1048576
-
-# Use pagination
-moidvk check-code -f app.js --limit 10 --offset 0
-
-# Enable caching
-moidvk check-code -f app.js --cache
-```
-
-#### Solution 3: Parallel Processing
-```bash
-# Process multiple files in parallel
-find . -name "*.js" | xargs -P 4 -I {} moidvk check-code -f {}
-```
-
-### Memory Issues
-
-**Symptoms**: Out of memory errors or high memory usage
-
-**Solutions**:
-```bash
-# Increase Node.js memory limit
-export NODE_OPTIONS="--max-old-space-size=4096"
-
-# Increase Bun memory limit
-export BUN_OPTIONS="--max-old-space-size=4096"
-
-# Monitor memory usage
-watch -n 1 'free -h && ps aux | grep moidvk'
-```
-
-### CPU Issues
-
-**Symptoms**: High CPU usage or slow processing
-
-**Solutions**:
-```bash
-# Check CPU usage
-top -p $(pgrep -f moidvk)
-
-# Optimize processing
-moidvk check-code -f app.js --optimize
-
-# Use background processing
-moidvk check-code -f app.js --background
-```
-
-## 🔒 Security Issues
-
-### Permission Errors
-
-**Symptoms**: Security-related permission errors
-
-**Solutions**:
-```bash
-# Check file permissions
-ls -la /opt/moidvk/
-
-# Fix ownership
-sudo chown -R moidvk:moidvk /opt/moidvk/
-
-# Fix permissions
-sudo chmod 755 /opt/moidvk/
-sudo chmod 600 /opt/moidvk/.env
-```
-
-### Consent Violations
-
-**Symptoms**: Explicit consent requirement errors
-
-**Solutions**:
-```bash
-# Check consent configuration
-moidvk config --show consent
-
-# Enable auto-consent for development
-moidvk config --set consent.auto_consent.enabled true
-
-# Check consent levels
-moidvk config --show consent.levels
-```
-
-### Path Security Issues
-
-**Symptoms**: Path traversal or workspace boundary errors
-
-**Solutions**:
-```bash
-# Check workspace configuration
-moidvk config --show workspace
-
-# Set workspace root
-moidvk config --set workspace.root /path/to/workspace
-
-# Check allowed paths
-moidvk config --show workspace.allowed_paths
-```
-
-## 🌐 Network and Connectivity Issues
-
-### Proxy Issues
-
-**Symptoms**: Network requests fail through proxy
-
-**Solutions**:
-```bash
-# Configure proxy
-export HTTP_PROXY=http://proxy.company.com:8080
-export HTTPS_PROXY=http://proxy.company.com:8080
-
-# Use proxy in configuration
-moidvk config --set network.proxy.enabled true
-moidvk config --set network.proxy.url http://proxy.company.com:8080
-```
-
-### Firewall Issues
-
-**Symptoms**: Network connections blocked
-
-**Solutions**:
-```bash
-# Check firewall status
-sudo ufw status
-
-# Allow MOIDVK ports
-sudo ufw allow 3000
-sudo ufw allow 9090
-
-# Check iptables
 sudo iptables -L
 ```
 
-### DNS Issues
+### Performance Issues
 
-**Symptoms**: Domain resolution failures
+#### Issue: Slow analysis performance
+
+**Symptoms**: Tools take longer than expected to complete
 
 **Solutions**:
+
 ```bash
-# Check DNS resolution
-nslookup registry.npmjs.org
+# Enable Rust components
+moidvk doctor --check-rust
+bun run build:rust
 
-# Use alternative DNS
-echo "nameserver 8.8.8.8" | sudo tee -a /etc/resolv.conf
+# Enable caching
+export MOIDVK_CACHE_ENABLED=true
 
-# Check network connectivity
-ping -c 4 registry.npmjs.org
+# Use parallel processing
+moidvk check-code -d src/ --parallel
+
+# Profile performance
+moidvk benchmark --detailed
+
+# Optimize file patterns
+moidvk check-code -f "src/**/*.js" --ignore "node_modules/**"
 ```
 
-## 💻 Platform-Specific Issues
+#### Issue: Cache-related problems
+
+**Symptoms**: Stale results, cache corruption errors
+
+**Solutions**:
+
+```bash
+# Clear all caches
+moidvk cache clear
+
+# Disable caching temporarily
+export MOIDVK_CACHE_ENABLED=false
+
+# Check cache directory
+ls -la ~/.cache/moidvk/
+
+# Reset cache directory
+rm -rf ~/.cache/moidvk/
+mkdir -p ~/.cache/moidvk/
+
+# Check disk space
+df -h ~/.cache/
+```
+
+## 🔧 Platform-Specific Issues
+
+### Linux Issues
+
+#### Issue: Missing system dependencies
+
+**Symptoms**: Build failures, missing library errors
+
+**Solutions**:
+
+```bash
+# Ubuntu/Debian
+sudo apt-get update
+sudo apt-get install build-essential pkg-config libssl-dev python3-dev
+
+# CentOS/RHEL/Fedora
+sudo yum groupinstall "Development Tools"
+sudo yum install openssl-devel python3-devel
+
+# Arch Linux
+sudo pacman -S base-devel openssl python
+```
+
+#### Issue: AppImage or Snap conflicts
+
+**Symptoms**: Node.js/Bun version conflicts
+
+**Solutions**:
+
+```bash
+# Use system package manager
+sudo apt remove nodejs npm
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Install Bun directly
+curl -fsSL https://bun.sh/install | bash
+```
 
 ### macOS Issues
 
-#### "Homebrew installation problems"
+#### Issue: Xcode Command Line Tools missing
+
+**Symptoms**: Compiler not found, build failures
 
 **Solutions**:
+
 ```bash
-# Update Homebrew
-brew update
+# Install Xcode Command Line Tools
+xcode-select --install
 
-# Fix Homebrew permissions
-sudo chown -R $(whoami) /usr/local/bin /usr/local/lib /usr/local/sbin
-chmod u+w /usr/local/bin /usr/local/lib /usr/local/sbin
+# Update if already installed
+sudo xcode-select --reset
 
-# Reinstall bun
-brew uninstall bun
-brew install bun
+# Check installation
+xcode-select -p
 ```
 
-#### "Permission denied on macOS"
+#### Issue: Homebrew conflicts
+
+**Symptoms**: Version conflicts, PATH issues
 
 **Solutions**:
+
 ```bash
-# Fix Gatekeeper issues
-sudo spctl --master-disable
+# Update Homebrew
+brew update && brew upgrade
 
-# Fix file permissions
-sudo chown -R $(whoami) /opt/moidvk/
+# Fix Homebrew permissions
+sudo chown -R $(whoami) $(brew --prefix)/*
 
-# Check SIP status
-csrutil status
+# Reset Homebrew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
 ### Windows Issues
 
-#### "PowerShell execution policy"
+#### Issue: PowerShell execution policy
+
+**Symptoms**: Scripts cannot be executed
 
 **Solutions**:
+
 ```powershell
+# Check current policy
+Get-ExecutionPolicy
+
 # Set execution policy
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
-# Run as administrator if needed
-Start-Process PowerShell -Verb RunAs
+# Bypass for single command
+powershell -ExecutionPolicy Bypass -Command "moidvk --version"
 ```
 
-#### "Path length limitations"
+#### Issue: Visual Studio Build Tools missing
+
+**Symptoms**: Native module compilation failures
 
 **Solutions**:
+
 ```powershell
-# Enable long paths
-New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
+# Install Visual Studio Build Tools
+# Download from: https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022
 
-# Use shorter installation path
-# Install MOIDVK in C:\moidvk instead of deep paths
+# Or use chocolatey
+choco install visualstudio2022buildtools
+
+# Or use winget
+winget install Microsoft.VisualStudio.2022.BuildTools
 ```
 
-### Linux Issues
+#### Issue: Windows Defender interference
 
-#### "Systemd service issues"
+**Symptoms**: Slow performance, files blocked
 
 **Solutions**:
-```bash
-# Check service status
-sudo systemctl status moidvk
 
-# View service logs
-sudo journalctl -u moidvk -f
-
-# Restart service
-sudo systemctl restart moidvk
-
-# Enable service
-sudo systemctl enable moidvk
+```powershell
+# Add exclusions to Windows Defender
+Add-MpPreference -ExclusionPath "C:\Users\%USERNAME%\.bun"
+Add-MpPreference -ExclusionPath "C:\Users\%USERNAME%\.npm"
+Add-MpPreference -ExclusionPath "C:\Users\%USERNAME%\.cache\moidvk"
 ```
 
-#### "SELinux issues"
+## 🐛 Error Code Reference
 
-**Solutions**:
+### MOIDVK Error Codes
+
+#### `MOIDVK_001`: Tool execution timeout
+
+**Cause**: Tool took longer than configured timeout **Solution**: Increase timeout or reduce file
+size
+
 ```bash
-# Check SELinux status
-sestatus
-
-# Set SELinux context
-sudo semanage fcontext -a -t bin_t "/opt/moidvk/bin(/.*)?"
-sudo restorecon -Rv /opt/moidvk/
-
-# Or disable SELinux temporarily
-sudo setenforce 0
+moidvk check-code -f app.js --timeout 120
 ```
 
-## 🔧 Debugging Techniques
+#### `MOIDVK_002`: Rust component unavailable
+
+**Cause**: Native Rust modules not built or incompatible **Solution**: Rebuild Rust components or
+use JavaScript fallback
+
+```bash
+bun run build:rust
+# or
+export MOIDVK_USE_JS_FALLBACK=true
+```
+
+#### `MOIDVK_003`: Configuration parse error
+
+**Cause**: Invalid JSON in configuration file **Solution**: Validate and fix configuration syntax
+
+```bash
+cat .moidvk.json | jq .
+```
+
+#### `MOIDVK_004`: File access denied
+
+**Cause**: Insufficient permissions to read/write files **Solution**: Check file permissions and
+ownership
+
+```bash
+chmod 644 file.js
+chown $(whoami) file.js
+```
+
+#### `MOIDVK_005`: Memory limit exceeded
+
+**Cause**: Analysis requires more memory than available **Solution**: Reduce concurrency or increase
+system memory
+
+```bash
+export MOIDVK_MAX_CONCURRENT=1
+```
+
+#### `MOIDVK_006`: Network connectivity error
+
+**Cause**: Cannot connect to external services (npm registry, etc.) **Solution**: Check network
+connection and proxy settings
+
+```bash
+npm config get proxy
+npm config get https-proxy
+```
+
+### System Error Codes
+
+#### Exit Code 1: General error
+
+**Common causes**: Invalid arguments, file not found **Solution**: Check command syntax and file
+paths
+
+#### Exit Code 2: Configuration error
+
+**Common causes**: Invalid configuration, missing required settings **Solution**: Validate
+configuration file
+
+#### Exit Code 130: Interrupted by user
+
+**Common causes**: Ctrl+C pressed during execution **Solution**: Normal behavior, no action needed
+
+## 🔍 Debugging Techniques
 
 ### Enable Debug Mode
 
 ```bash
 # Enable debug logging
-DEBUG=true moidvk serve
+export MOIDVK_DEBUG=true
+export MOIDVK_LOG_LEVEL=debug
 
-# Enable verbose output
-moidvk serve --verbose
+# Run with debug output
+MOIDVK_DEBUG=true moidvk check-code -f app.js
 
-# Enable trace logging
-moidvk serve --trace
+# Save debug output
+MOIDVK_DEBUG=true moidvk check-code -f app.js 2> debug.log
 ```
 
-### Log Analysis
+### Verbose Output
 
 ```bash
-# View application logs
-tail -f /opt/moidvk/logs/app.log
+# Enable verbose mode
+moidvk check-code -f app.js --verbose
 
-# View error logs
-tail -f /opt/moidvk/logs/error.log
-
-# View security logs
-tail -f /opt/moidvk/logs/security.log
-
-# Search logs for errors
-grep -i "error" /opt/moidvk/logs/*.log
+# Maximum verbosity
+moidvk check-code -f app.js -vvv
 ```
 
 ### Performance Profiling
 
 ```bash
-# Profile Node.js application
-node --prof /opt/moidvk/server.js
-
-# Analyze profile
-node --prof-process isolate-*.log > profile.txt
+# Profile tool execution
+moidvk benchmark --tool check_code_practices
 
 # Memory profiling
-node --inspect /opt/moidvk/server.js
+moidvk benchmark --memory --tool check_code_practices
+
+# Detailed timing
+time moidvk check-code -f app.js
 ```
 
 ### Network Debugging
 
 ```bash
-# Check network connections
-netstat -tlnp | grep moidvk
-
-# Monitor network traffic
-tcpdump -i lo port 3000
-
-# Test connectivity
+# Test MCP server connectivity
 curl -v http://localhost:3000/health
+
+# Check DNS resolution
+nslookup registry.npmjs.org
+
+# Test with different network
+moidvk scan-security --offline
 ```
 
-## 📞 Getting Help
+## 🛠️ Recovery Procedures
 
-### Self-Service Resources
-
-1. **Documentation**: Check the [main documentation](README.md)
-2. **FAQ**: Review common questions and answers
-3. **Search**: Search existing issues and discussions
-4. **Community**: Check community forums and discussions
-
-### Contact Support
-
-#### Before Contacting Support
-
-1. **Gather Information**:
-   - MOIDVK version: `moidvk --version`
-   - System information: `uname -a`
-   - Error logs: Copy relevant log entries
-   - Steps to reproduce: Document exact steps
-
-2. **Check Known Issues**:
-   - Search GitHub issues
-   - Check release notes
-   - Review changelog
-
-3. **Try Basic Troubleshooting**:
-   - Restart services
-   - Clear caches
-   - Update to latest version
-
-#### Support Channels
-
-- **GitHub Issues**: [Repository Issues](https://github.com/your-org/moidvk/issues)
-- **Documentation**: [Documentation Site](https://docs.moidvk.com)
-- **Email Support**: support@moidvk.com
-- **Emergency Contact**: emergency@moidvk.com
-
-#### Information to Provide
-
-When contacting support, include:
+### Complete Reset
 
 ```bash
-# System information
-moidvk --version
-uname -a
-node --version
-bun --version
+# Uninstall completely
+bun remove -g @moikas/moidvk
+npm uninstall -g @moikas/moidvk
 
-# Configuration
-moidvk config --show
+# Remove all data
+rm -rf ~/.moidvk
+rm -rf ~/.config/moidvk
+rm -rf ~/.cache/moidvk
 
-# Error logs
-tail -n 50 /opt/moidvk/logs/error.log
+# Clear npm/bun cache
+npm cache clean --force
+bun pm cache rm
 
-# Steps to reproduce
-# 1. What you were trying to do
-# 2. What command you ran
-# 3. What error you received
-# 4. What you expected to happen
+# Fresh installation
+bun install -g @moikas/moidvk
+
+# Verify installation
+moidvk doctor
 ```
+
+### Rebuild Native Components
+
+```bash
+# Navigate to installation directory
+cd $(npm root -g)/@moikas/moidvk
+
+# Clean and rebuild
+cargo clean
+bun run build:rust
+bun run build:napi
+
+# Test rebuilt components
+moidvk doctor --check-rust
+```
+
+### Reset Configuration
+
+```bash
+# Backup current config
+cp .moidvk.json .moidvk.json.backup
+
+# Generate default config
+moidvk config init
+
+# Restore specific settings
+moidvk config set tools.check_code_practices.production true
+```
+
+## 📊 Performance Optimization
+
+### System Optimization
+
+```bash
+# Increase file descriptor limits
+ulimit -n 4096
+
+# Optimize for SSD
+echo madvise | sudo tee /sys/kernel/mm/transparent_hugepage/enabled
+
+# Increase inotify limits (Linux)
+echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
+```
+
+### MOIDVK Optimization
+
+```bash
+# Enable all performance features
+export MOIDVK_USE_RUST=true
+export MOIDVK_CACHE_ENABLED=true
+export MOIDVK_MAX_CONCURRENT=4
+
+# Optimize for your workflow
+moidvk config set performance.caching.enabled true
+moidvk config set performance.parallel.maxConcurrent 4
+moidvk config set performance.rust.enabled true
+```
+
+## 🆘 Getting Help
+
+### Self-Help Resources
+
+1. **Run diagnostics**: `moidvk doctor --verbose`
+2. **Check logs**: `~/.cache/moidvk/logs/`
+3. **Review configuration**: `moidvk config show`
+4. **Test individual tools**: `moidvk <tool> --help`
 
 ### Community Support
 
-- **GitHub Discussions**: Community discussions and Q&A
-- **Stack Overflow**: Tag questions with `moidvk`
-- **Reddit**: r/moidvk community
-- **Discord**: Community chat and support
+- **[GitHub Issues](https://github.com/moikas-code/moidvk/issues)** - Bug reports and feature
+  requests
+- **[Discussions](https://github.com/moikas-code/moidvk/discussions)** - Community Q&A
+- **[Discord](https://discord.gg/moidvk)** - Real-time support
 
-## 📚 Additional Resources
+### Reporting Issues
 
-### Troubleshooting Tools
+When reporting issues, include:
 
-- **MOIDVK Doctor**: `moidvk doctor` - Comprehensive system check
-- **Configuration Validator**: `moidvk config --validate`
-- **Dependency Checker**: `moidvk check-dependencies`
-- **Performance Monitor**: `moidvk monitor`
+```bash
+# System information
+moidvk doctor --verbose > system-info.txt
 
-### External Tools
+# Error logs
+cat ~/.cache/moidvk/logs/error.log
 
-- **System Monitor**: `htop`, `iotop`, `nethogs`
-- **Network Tools**: `tcpdump`, `wireshark`, `curl`
-- **Process Tools**: `strace`, `ltrace`, `gdb`
-- **Log Analysis**: `grep`, `awk`, `sed`
+# Configuration
+cat .moidvk.json
+
+# Environment
+env | grep MOIDVK
+```
+
+### Emergency Contacts
+
+For critical production issues:
+
+- **Email**: support@moidvk.dev
+- **Priority Support**: Available for enterprise users
 
 ---
 
-**Troubleshooting Complete!** 🔧 This guide should help you resolve most issues with MOIDVK. If you're still experiencing problems, contact support with the information requested above.
+**Still having issues?** Create a [GitHub issue](https://github.com/moikas-code/moidvk/issues/new)
+with your diagnostic output and we'll help you resolve it quickly.
