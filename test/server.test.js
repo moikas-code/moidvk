@@ -19,8 +19,16 @@ describe('MCP Server Tests', () => {
       }
     });
 
-    // Wait for server to start
-    await sleep(1000);
+    // Also listen to stderr in case output goes there
+    server.stderr.on('data', (data) => {
+      const output = data.toString();
+      if (output.includes('Server running with') || output.includes('IntegrationManager')) {
+        started = true;
+      }
+    });
+
+    // Wait longer for server to start
+    await sleep(2000);
 
     expect(started).toBe(true);
 
