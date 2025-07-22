@@ -9,10 +9,10 @@
 [![Powered by Bun](https://img.shields.io/badge/powered%20by-Bun-yellow.svg)](https://bun.sh/)
 
 > **The Ultimate DevKit** - A comprehensive Model Context Protocol (MCP) server that unifies
-> development best practices across JavaScript/TypeScript, Rust, and Python into a single, powerful
-> toolkit.
+> development best practices across JavaScript/TypeScript, Rust, Python, and Go into a single,
+> powerful toolkit.
 
-MOIDVK provides **37+ intelligent development tools** with security-first design, high-performance
+MOIDVK provides **43+ intelligent development tools** with security-first design, high-performance
 Rust core, and seamless integration with your favorite AI assistants and development environments.
 
 ## ✨ Key Features
@@ -22,6 +22,7 @@ Rust core, and seamless integration with your favorite AI assistants and develop
 - **JavaScript/TypeScript**: ESLint analysis, Prettier formatting, accessibility checks
 - **Rust**: Clippy analysis, rustfmt formatting, performance optimization, safety checks
 - **Python**: Ruff analysis, Black formatting, type checking, dependency scanning
+- **Go**: go vet analysis, gofmt/goimports formatting, security scanning, performance analysis
 
 🔒 **Security-First Architecture**
 
@@ -46,7 +47,7 @@ Rust core, and seamless integration with your favorite AI assistants and develop
 
 🛠️ **Developer Experience**
 
-- 37+ tools in one unified MCP server
+- 43+ tools in one unified MCP server
 - CLI interface for standalone usage
 - Comprehensive error handling and fallbacks
 - Extensive documentation and examples
@@ -110,11 +111,13 @@ moidvk search-semantic -p /path/to/project --query "authentication logic"
 
 ### 🎨 Code Formatting
 
-| Tool               | Language          | Description                               |
-| ------------------ | ----------------- | ----------------------------------------- |
-| `format_code`      | JS/TS/CSS/HTML/MD | Prettier formatting with project config   |
-| `rust_formatter`   | Rust              | rustfmt with configurable style options   |
-| `python_formatter` | Python            | Black formatting with line length control |
+| Tool                        | Language          | Description                                      |
+| --------------------------- | ----------------- | ------------------------------------------------ |
+| `format_code`               | JS/TS/CSS/HTML/MD | Prettier formatting with project config          |
+| `eslint_auto_fixer`         | JS/TS             | ESLint auto-fix with comprehensive linting       |
+| `multi_language_auto_fixer` | **All Languages** | **Universal auto-fixer with language detection** |
+| `rust_formatter`            | Rust              | rustfmt with configurable style options          |
+| `python_formatter`          | Python            | Black formatting with line length control        |
 
 ### 🔒 Security & Safety
 

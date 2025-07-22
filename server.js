@@ -64,6 +64,11 @@ import {
   envConfigValidatorTool,
   handleEnvConfigValidator,
 } from './lib/tools/env-config-validator.js';
+import { eslintAutoFixerTool, runEslintAutoFixer } from './lib/tools/eslint-auto-fixer.js';
+import {
+  multiLanguageAutoFixerTool,
+  runMultiLanguageAutoFixer,
+} from './lib/tools/multi-language-auto-fixer.js';
 
 // Import security tools
 import { secureBashTool, handleSecureBash } from './lib/security/secure-bash.js';
@@ -110,6 +115,21 @@ import {
 } from './lib/python/python-dependency-scanner.js';
 // Import Git tools (from lib/git/)
 import { gitBlameAnalyzerTool, handleGitBlameAnalyzer } from './lib/git/git-blame-analyzer.js';
+// Import Go tools (from lib/go/)
+import {
+  goCodeAnalyzerTool,
+  goFormatterTool,
+  goSecurityScannerTool,
+  goPerformanceAnalyzerTool,
+  goTestAnalyzerTool,
+  goDependencyScannerTool,
+  analyzeGoCode,
+  formatGoCode,
+  scanGoSecurity,
+  analyzeGoPerformance,
+  analyzeGoTests,
+  scanGoDependencies,
+} from './lib/go/index.js';
 // Import Audit tools
 import { auditCompletionTool, handleAuditCompletion } from './lib/tools/audit-completion.js';
 
@@ -120,7 +140,7 @@ class MOIDVKServer {
         name: 'moidvk',
         version: '2.1.4',
         description:
-          'Intelligent Development and Deployment MCP Server - Comprehensive code analysis, formatting, and security tools for JavaScript/TypeScript, Rust, and Python projects.',
+          'Intelligent Development and Deployment MCP Server - Comprehensive code analysis, formatting, and security tools for JavaScript/TypeScript, Rust, Python, and Go projects.',
       },
       {
         capabilities: {
@@ -148,6 +168,8 @@ class MOIDVKServer {
       // JavaScript/TypeScript tools
       ['check_code_practices', handleCodePractices],
       ['format_code', handleCodeFormatter],
+      ['eslint_auto_fixer', runEslintAutoFixer],
+      ['multi_language_auto_fixer', runMultiLanguageAutoFixer],
       ['check_safety_rules', handleSafetyChecker],
       ['scan_security_vulnerabilities', handleSecurityScanner],
       ['check_production_readiness', handleProductionReadiness],
@@ -193,6 +215,14 @@ class MOIDVKServer {
       // Git tools
       ['git_blame_analyzer', handleGitBlameAnalyzer],
 
+      // Go tools
+      ['go_code_analyzer', analyzeGoCode],
+      ['go_formatter', formatGoCode],
+      ['go_security_scanner', scanGoSecurity],
+      ['go_performance_analyzer', analyzeGoPerformance],
+      ['go_test_analyzer', analyzeGoTests],
+      ['go_dependency_scanner', scanGoDependencies],
+
       // Audit tools
       ['audit_completion', handleAuditCompletion],
     ]);
@@ -205,6 +235,8 @@ class MOIDVKServer {
       // JavaScript/TypeScript tools
       codePracticesTool,
       codeFormatterTool,
+      eslintAutoFixerTool,
+      multiLanguageAutoFixerTool,
       safetyCheckerTool,
       securityScannerTool,
       productionReadinessTool,
@@ -249,6 +281,14 @@ class MOIDVKServer {
 
       // Git tools
       gitBlameAnalyzerTool,
+
+      // Go tools
+      goCodeAnalyzerTool,
+      goFormatterTool,
+      goSecurityScannerTool,
+      goPerformanceAnalyzerTool,
+      goTestAnalyzerTool,
+      goDependencyScannerTool,
 
       // Audit tools
       auditCompletionTool,
