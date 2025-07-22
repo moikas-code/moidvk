@@ -148,12 +148,32 @@ export interface BenchmarkResult {
 }
 /** Quick benchmark function */
 export declare function quickBenchmark(): Record<string, number>
+/**
+ * Initialize the MOIDVK Rust core module
+ *
+ * Returns a success message indicating the core has been initialized
+ */
 export declare function initializeRustCore(): string
+/**
+ * Get the version of the MOIDVK core crate
+ *
+ * Returns the version string from Cargo.toml
+ */
 export declare function getVersion(): string
+/**
+ * Get performance information about the Rust runtime
+ *
+ * Returns JSON string with SIMD support, thread count, allocator info, etc.
+ */
 export declare function getPerformanceInfo(): string
 /** Vector operations implementation */
 export declare class VectorOperations {
-  /** Create a new vector operations instance */
+  /**
+   * Create a new vector operations instance with optional configuration
+   *
+   * # Arguments
+   * * `config` - Optional configuration for vector operations
+   */
   constructor(config?: VectorConfig | undefined | null)
   /**
    * Calculate cosine similarity between two vectors
@@ -181,7 +201,12 @@ export declare class VectorOperations {
 }
 /** File search operations implementation */
 export declare class FileSearch {
-  /** Create a new file search instance */
+  /**
+   * Create a new file search instance with optional configuration
+   *
+   * # Arguments
+   * * `config` - Optional configuration for file search operations
+   */
   constructor(config?: FileSearchConfig | undefined | null)
   /**
    * Search for files by glob pattern
@@ -202,6 +227,7 @@ export declare class FileSearch {
 }
 /** Text processor for high-performance pattern matching */
 export declare class TextProcessor {
+  /** Create a new text processing instance with optional configuration */
   constructor(config?: TextProcessingConfig | undefined | null)
   /** Fast substring search using Aho-Corasick */
   findSubstrings(text: string, patterns: Array<string>): Array<TextMatch>
@@ -210,6 +236,7 @@ export declare class TextProcessor {
 }
 /** Security utilities */
 export declare class SecurityUtils {
+  /** Create a new security utilities instance */
   constructor()
   /** Validate and sanitize file path */
   validatePath(path: string, basePath: string): PathValidationResult
@@ -218,6 +245,7 @@ export declare class SecurityUtils {
 }
 /** Benchmark suite */
 export declare class BenchmarkSuite {
+  /** Create a new benchmark runner instance */
   constructor()
   /** Run all performance benchmarks */
   runAllBenchmarks(): Array<BenchmarkResult>
