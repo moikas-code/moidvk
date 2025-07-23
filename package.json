@@ -1,6 +1,6 @@
 {
   "name": "@moikas/moidvk",
-  "version": "2.2.0",
+  "version": "2.2.2",
   "description": "The Ultimate DevKit - MCP server for development best practices",
   "main": "server.js",
   "module": "server.js",
