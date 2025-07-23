@@ -324,7 +324,7 @@ class MOIDVKServer {
       }
 
       try {
-        const result = await handler(args || {});
+        const result = await handler({ params: args || {} });
         console.error(`[MOIDVK] Tool ${name} completed successfully`);
         return result;
       } catch (error) {
