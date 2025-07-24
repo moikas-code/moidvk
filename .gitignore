@@ -39,3 +39,9 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 CLAUDE.local.md
 
 .backup*
+
+# Rust build artifacts
+target/
+lib/rust-core/target/
+lib/rust-core/Cargo.lock
+*.node
