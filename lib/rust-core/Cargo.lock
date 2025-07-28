@@ -340,9 +340,9 @@ dependencies = [
 
 [[package]]
 name = "napi-build"
-version = "2.2.2"
+version = "2.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fff539e61c5e3dd4d7d283610662f5d672c2aea0f158df78af694f13dbb3287b"
+checksum = "dcae8ad5609d14afb3a3b91dee88c757016261b151e9dcecabf1b2a31a6cab14"
 
 [[package]]
 name = "napi-derive"
@@ -513,9 +513,9 @@ dependencies = [
 
 [[package]]
 name = "redox_syscall"
-version = "0.5.14"
+version = "0.5.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "de3a5d9f0aba1dbcec1cc47f0ff94a4b778fe55bca98a6dfa92e4e094e57b1c4"
+checksum = "7251471db004e509f4e75a62cca9435365b5ec7bcdff530d612ac7c87c44a792"
 dependencies = [
  "bitflags",
 ]
