@@ -132,6 +132,8 @@ import {
 } from './lib/go/index.js';
 // Import Audit tools
 import { auditCompletionTool, handleAuditCompletion } from './lib/tools/audit-completion.js';
+// Import KB optimization tools
+import { kbListOptimizedTool, handleKbListOptimized } from './lib/tools/kb-list-optimized.js';
 
 class MOIDVKServer {
   constructor() {
@@ -225,6 +227,9 @@ class MOIDVKServer {
 
       // Audit tools
       ['audit_completion', handleAuditCompletion],
+
+      // KB optimization tools
+      ['kb_list_optimized', handleKbListOptimized],
     ]);
 
     this.setupHandlers();
@@ -292,6 +297,9 @@ class MOIDVKServer {
 
       // Audit tools
       auditCompletionTool,
+
+      // KB optimization tools
+      kbListOptimizedTool,
     ];
     return tools;
   }
