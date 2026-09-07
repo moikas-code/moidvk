@@ -88,29 +88,29 @@
   "author": "Warren Gates",
   "license": "MIT",
   "devDependencies": {
-    "@napi-rs/cli": "^3.0.1",
-    "@types/bun": "^1.2.19",
+    "@napi-rs/cli": "^3.9.0",
+    "@types/bun": "^1.4.1",
     "cargo-cp-artifact": "^0.1.9"
   },
   "peerDependencies": {
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@babel/parser": "^7.28.0",
-    "@babel/traverse": "^7.28.0",
-    "@modelcontextprotocol/sdk": "^1.16.0",
-    "@reduxjs/toolkit": "^2.8.2",
+    "@babel/parser": "^7.29.8",
+    "@babel/traverse": "^7.29.8",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@reduxjs/toolkit": "^2.12.0",
     "@xenova/transformers": "^2.17.2",
-    "axe-core": "^4.10.3",
-    "eslint": "^9.31.0",
+    "axe-core": "^4.13.0",
+    "eslint": "^9.39.5",
     "eslint-plugin-unicorn": "^60.0.0",
-    "graphql": "^16.11.0",
+    "graphql": "^16.14.2",
     "graphql-depth-limit": "^1.1.0",
-    "graphql-tools": "^9.0.20",
+    "graphql-tools": "^9.0.34",
     "jsdom": "^26.1.0",
-    "prettier": "^3.6.2",
-    "puppeteer": "^24.14.0",
-    "zod": "^4.0.5"
+    "prettier": "^3.9.6",
+    "puppeteer": "^24.43.1",
+    "zod": "^4.5.4"
   },
   "engines": {
     "bun": ">=1.0.0",
